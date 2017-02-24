@@ -40,9 +40,19 @@ public class DatabaseHelper {
             values.put(DraftColumns.content, postService.getContent());
             values.put(DraftColumns.filePath, postService.getFilePath());
 
-            int id = context.getContentResolver().update(draftUri, values, null, null);
+            int rows = context.getContentResolver().update(draftUri, values, null, null);
 
-            subscriber.onNext(id);
+            subscriber.onNext(rows);
+            subscriber.onCompleted();
+        });
+    }
+
+    public Observable<Integer> deleteUri(Uri uri) {
+        return Observable.create(subscriber -> {
+
+            int rows = context.getContentResolver().delete(uri, null, null);
+
+            subscriber.onNext(rows);
             subscriber.onCompleted();
         });
     }

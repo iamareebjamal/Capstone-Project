@@ -194,7 +194,7 @@ public class PostActivity extends AppCompatActivity {
         if(condition) {
 
             Snackbar.make(rootLayout, "Post Saved", Snackbar.LENGTH_LONG)
-                    .setAction("Undo", view -> deleteDraft(draftUri))
+                    .setAction("Undo", view -> deleteDraft())
                     .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
                     .show();
 
@@ -204,6 +204,7 @@ public class PostActivity extends AppCompatActivity {
                     .setAction("Retry", view -> saveInDraft())
                     .show();
 
+            draftUri = null;
             Log.d(TAG, "Post Save Failed");
         }
     }
@@ -237,10 +238,38 @@ public class PostActivity extends AppCompatActivity {
                 }, throwableHandler);
     }
 
-    private void deleteDraft(Uri uri) {
-        Snackbar.make(rootLayout, "Draft deleted", Snackbar.LENGTH_LONG)
-                .setAction("Undo", view -> savePost())
-                .show();
+    private void deleteDraft() {
+        if(draftUri == null) {
+            Snackbar.make(rootLayout, "No Draft to Delete. Create new?", Snackbar.LENGTH_LONG)
+                    .setAction("Yes", view -> saveInDraft())
+                    .show();
+
+            return;
+        }
+
+        db.deleteUri(draftUri)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .subscribe(rows -> {
+                    progressBar.setVisibility(View.GONE);
+                    if (rows != 0) {
+                        draftUri = null;
+
+                        Snackbar.make(rootLayout, "Draft Deleted", Snackbar.LENGTH_LONG)
+                                .setAction("Undo", view -> saveInDraft())
+                                .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                                .show();
+
+                        Log.d(TAG, "Post Deleted : " + draftUri.toString() + " Rows : " + rows);
+                    } else {
+                        Snackbar.make(rootLayout, "Deleting Post Failed", Snackbar.LENGTH_LONG)
+                                .setAction("Retry", view -> deleteDraft())
+                                .show();
+
+                        Log.d(TAG, "Post Delete Failed");
+                    }
+                }, throwableHandler);
     }
 
     private void loadImage() {
