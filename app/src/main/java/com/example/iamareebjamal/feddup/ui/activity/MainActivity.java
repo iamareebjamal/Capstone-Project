@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.viewholder.PostHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -20,6 +23,8 @@ import com.google.firebase.database.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -77,6 +82,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void loadDrafts() {
+        DatabaseHelper db = new DatabaseHelper(this);
+
+        db.getDrafts()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(postService -> {
+                    Log.d("Loaded", postService.toString());
+                }, throwable ->  {
+                    Log.d("Loaded", throwable.getMessage());
+                });
+    }
+
     @OnClick(R.id.fab)
     public void startPostActivity(){
         startActivity(new Intent(this, PostActivity.class));
@@ -88,6 +106,21 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+            case R.id.drafts:
+                loadDrafts();
+                break;
+            default:
+                // Do nothing
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

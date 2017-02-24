@@ -58,4 +58,14 @@ public class PostService {
 
         return FeddupApi.getFeddupService().post(body, title, user, content);
     }
+
+    @Override
+    public String toString() {
+        return "PostService{" +
+                "title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", content='" + content + '\'' +
+                ", filePath='" + filePath + '\'' +
+                '}';
+    }
 }

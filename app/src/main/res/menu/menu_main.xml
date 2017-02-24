@@ -3,8 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:title="Drafts"
+        android:id="@+id/drafts"
+        android:icon="@drawable/ic_save"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:title="Favorites"
         android:id="@+id/favorites"
         android:icon="@drawable/ic_heart"
         app:showAsAction="always" />
+
 </menu>

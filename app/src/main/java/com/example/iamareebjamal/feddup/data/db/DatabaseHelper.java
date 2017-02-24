@@ -2,6 +2,7 @@ package com.example.iamareebjamal.feddup.data.db;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
 import com.example.iamareebjamal.feddup.api.PostService;
@@ -15,6 +16,41 @@ public class DatabaseHelper {
 
     public DatabaseHelper(Context context) {
         this.context = context;
+    }
+
+    public Observable<PostService> getDrafts() {
+        return Observable.create(subscriber -> {
+            Cursor cursor = context.getContentResolver().query(
+                    DatabaseProvider.Drafts.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+
+            if (cursor != null) {
+                cursor.moveToFirst();
+
+                do {
+
+                    String title = cursor.getString(cursor.getColumnIndex(DraftColumns.title));
+                    String author = cursor.getString(cursor.getColumnIndex(DraftColumns.author));
+                    String content = cursor.getString(cursor.getColumnIndex(DraftColumns.content));
+                    String filePath = cursor.getString(cursor.getColumnIndex(DraftColumns.filePath));
+
+                    PostService postService = new PostService();
+                    postService.setTitle(title);
+                    postService.setAuthor(author);
+                    postService.setContent(content);
+                    postService.setFilePath(filePath);
+
+                    subscriber.onNext(postService);
+                } while (cursor.moveToNext());
+
+                cursor.close();
+            }
+
+            subscriber.onCompleted();
+        });
     }
 
     public Observable<Uri> insertDraft(PostService postService) {
