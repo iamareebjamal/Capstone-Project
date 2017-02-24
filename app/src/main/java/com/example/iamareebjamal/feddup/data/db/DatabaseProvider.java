@@ -58,12 +58,12 @@ public class DatabaseProvider {
                 name = "FAVORITE_ID",
                 path = Database.Favorites + "/#",
                 type = "vnd.android.cursor.item/Favorite",
-                whereColumn = PostColumns._ID,
+                whereColumn = PostColumns.POST_KEY,
                 pathSegment = 1
         )
 
-        public static Uri withId(int id) {
-            return buildUri(Database.Favorites, String.valueOf(id));
+        public static Uri withId(String id) {
+            return buildUri(Database.Favorites, id);
         }
     }
 
@@ -79,12 +79,12 @@ public class DatabaseProvider {
                 name = "DOWNVOTE_ID",
                 path = Database.Downvotes + "/#",
                 type = "vnd.android.cursor.item/Downvote",
-                whereColumn = PostColumns._ID,
+                whereColumn = PostColumns.POST_KEY,
                 pathSegment = 1
         )
 
-        public static Uri withId(int id) {
-            return buildUri(Database.Downvotes, String.valueOf(id));
+        public static Uri withId(String id) {
+            return buildUri(Database.Downvotes, id);
         }
     }
 

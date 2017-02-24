@@ -1,7 +1,12 @@
 package com.example.iamareebjamal.feddup.ui.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.icu.util.Currency;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
+import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
+import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.viewholder.PostHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -21,8 +29,19 @@ import com.google.firebase.database.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int FAVORITE_LOADER = 1;
+    private static final int DOWNVOTES_CURSOR = 2;
+
+    private Cursor favoriteCursor;
+    private Cursor downvotesCursor;
+
+    private FavoritesHelper favoritesHelper = new FavoritesHelper(this);
+    private DownvotesHelper downvotesHelper = new DownvotesHelper(this);
 
     @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.post_list) RecyclerView recyclerView;
@@ -38,13 +57,16 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        getSupportLoaderManager().initLoader(FAVORITE_LOADER, null, this);
+        getSupportLoaderManager().initLoader(DOWNVOTES_CURSOR, null, this);
         setupList();
     }
 
     public void setupList(){
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         Query postReference = FirebaseDatabase.getInstance().getReference("posts").orderByChild("downvotes").limitToFirst(10);
 
         postAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(Post.class, R.layout.item_card, PostHolder.class, postReference) {
@@ -72,6 +94,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void loadFavorites() {
+        if(favoriteCursor == null) return;
+
+        PostHolder.clearFavorites();
+        favoritesHelper
+                .getFavoritesFromCursor(favoriteCursor)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(key -> {
+                    PostHolder.addFavorite(key);
+                    postAdapter.notifyDataSetChanged();
+                });
+    }
+
+    private void loadDownvotes() {
+        if(downvotesCursor == null) return;
+
+        PostHolder.clearDownVoted();
+        downvotesHelper
+                .getDowvotesFromCursor(downvotesCursor)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(key -> {
+                    PostHolder.addDownVoted(key);
+                    postAdapter.notifyDataSetChanged();
+                });
+
+    }
+
 
     private void loadDrafts() {
         startActivity(new Intent(this, DraftsActivity.class));
@@ -105,4 +157,38 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if(id == FAVORITE_LOADER)
+            return new CursorLoader(this, DatabaseProvider.Favorites.CONTENT_URI, null, null, null, null);
+        else
+            return new CursorLoader(this, DatabaseProvider.Downvotes.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case FAVORITE_LOADER:
+                if(favoriteCursor != null) favoriteCursor.close();
+
+                favoriteCursor = data;
+
+                loadFavorites();
+                break;
+            case DOWNVOTES_CURSOR:
+                if(downvotesCursor != null) downvotesCursor.close();
+
+                downvotesCursor = data;
+
+                loadDownvotes();
+                break;
+        }
+
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if(favoriteCursor != null) favoriteCursor.close();
+    }
 }
