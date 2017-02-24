@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -17,6 +16,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -40,6 +42,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -51,7 +54,7 @@ public class PostActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
-    @BindView(R.id.postImage) ImageView post_image;
+    @BindView(R.id.postImage) ImageView postImage;
     @BindView(R.id.image) FloatingActionButton loadImage;
     @BindView(R.id.post) FloatingActionButton postArticle;
 
@@ -83,10 +86,10 @@ public class PostActivity extends AppCompatActivity {
                 .load("http://netdna.webdesignerdepot.com/uploads/2015/07/featured_mdl.jpg")
                 .fit()
                 .centerCrop()
-                .into(post_image);
+                .into(postImage);
 
         loadImage.setOnClickListener(view -> requestPermissionAndLoadImage());
-        postArticle.setOnClickListener(view -> postArticle());
+        postArticle.setOnClickListener(view -> sendPost());
 
         setupForm();
     }
@@ -136,7 +139,7 @@ public class PostActivity extends AppCompatActivity {
                 });
     }
 
-    private void postArticle() {
+    private PostService preparePost() {
         PostService postService = new PostService();
 
         postService.setTitle(title_text.getText().toString());
@@ -144,7 +147,11 @@ public class PostActivity extends AppCompatActivity {
         postService.setContent(content_text.getText().toString());
         postService.setFilePath(filePath);
 
-        postService
+        return postService;
+    }
+
+    private void sendPost() {
+        preparePost()
                 .send()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -166,6 +173,41 @@ public class PostActivity extends AppCompatActivity {
                         Snackbar.make(rootLayout, postConfirmation.getMessage(), Snackbar.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void savePost() {
+        Log.d("LOL", "Start");
+        preparePost()
+                .save(this)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .subscribe(uri -> {
+                    progressBar.setVisibility(View.GONE);
+                    if(uri != null) {
+                        Snackbar.make(rootLayout, "Post Saved", Snackbar.LENGTH_LONG)
+                                .setAction("Undo", view -> deleteDraft(uri))
+                                .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                                .show();
+
+                        Log.d("LOL", uri.toString());
+                    } else {
+                        Snackbar.make(rootLayout, "Saving Post Failed", Snackbar.LENGTH_LONG)
+                                .setAction("Retry", view -> savePost())
+                                .show();
+
+                        Log.d("LOL", "null");
+                    }
+                }, throwable -> {
+                    progressBar.setVisibility(View.GONE);
+                    Log.d("LOL", throwable.getMessage());
+                });
+    }
+
+    private void deleteDraft(Uri uri) {
+        Snackbar.make(rootLayout, "Draft deleted", Snackbar.LENGTH_LONG)
+                .setAction("Undo", view -> savePost())
+                .show();
     }
 
     private void loadImage() {
@@ -196,7 +238,7 @@ public class PostActivity extends AppCompatActivity {
                     .load(fileUri)
                     .fit()
                     .centerCrop()
-                    .into(post_image);
+                    .into(postImage);
 
             filePath = Utils.getFilePath(this, fileUri);
             created.onNext(true);
@@ -227,11 +269,23 @@ public class PostActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+            case R.id.save:
+                savePost();
+                break;
+            default:
+                // Do nothing
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_post, menu);
+        return true;
     }
 }

@@ -20,11 +20,17 @@
         <activity
             android:name=".ui.activity.PostActivity"
             android:label="Create Post"
-            android:theme="@style/AppTheme.Post"></activity>
+            android:theme="@style/AppTheme.Post" />
+
         <activity
             android:name=".ui.activity.DetailActivity"
             android:label=""
-            android:theme="@style/AppTheme.Detail"></activity>
+            android:theme="@style/AppTheme.Detail" />
+
+        <provider
+            android:name=".data.db.generated.DatabaseProvider"
+            android:authorities="iamareebjamal.feddup.DatabaseProvider"
+            android:exported="true" />
     </application>
 
 </manifest>

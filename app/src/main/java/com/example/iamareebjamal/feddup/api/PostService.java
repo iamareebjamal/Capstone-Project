@@ -1,5 +1,9 @@
 package com.example.iamareebjamal.feddup.api;
 
+import android.content.Context;
+import android.net.Uri;
+
+import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 
 import java.io.File;
@@ -43,7 +47,8 @@ public class PostService {
         return FeddupApi.getFeddupService().post(body, title, user, content);
     }
 
-    public Observable save() {
-        return Observable.empty();
+    public Observable<Uri> save(Context context) {
+        return DatabaseHelper
+                .insertDraft(context, title, author, content, filePath);
     }
 }
