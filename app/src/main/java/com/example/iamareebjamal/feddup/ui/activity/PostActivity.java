@@ -336,10 +336,20 @@ public class PostActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        saveInDraft();
+
+        Toast.makeText(this, "Saving in Drafts", Toast.LENGTH_LONG).show();
+
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
+                break;
             case R.id.save:
                 saveInDraft();
                 break;
