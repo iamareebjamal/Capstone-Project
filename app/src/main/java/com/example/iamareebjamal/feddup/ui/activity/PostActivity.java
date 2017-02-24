@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,10 +43,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -73,6 +74,7 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.progress) ProgressBar progressBar;
 
     PublishSubject<Boolean> created = PublishSubject.create();
+    CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     Action1<Throwable> throwableHandler = (throwable) -> {
         progressBar.setVisibility(View.GONE);
@@ -115,7 +117,7 @@ public class PostActivity extends AppCompatActivity {
                         .debounce(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread());
 
-        formObservable.subscribe(isValid -> {
+        Subscription subscription = formObservable.subscribe(isValid -> {
             if(isValid) {
                 textInputLayout.setError(null);
                 textInputLayout.setErrorEnabled(false);
@@ -124,6 +126,8 @@ public class PostActivity extends AppCompatActivity {
                 textInputLayout.setError(message);
             }
         });
+
+        compositeSubscription.add(subscription);
 
         return formObservable;
     }
@@ -135,7 +139,7 @@ public class PostActivity extends AppCompatActivity {
         Observable<Boolean> userObservable = formValidObservable(user_text, user_wrapper, 4, 16);
         Observable<Boolean> contentObservable = formValidObservable(content_text, content_wrapper, 10, 50000);
 
-        Observable.combineLatest(
+        Subscription subscription = Observable.combineLatest(
                 titleObservable,
                 userObservable,
                 contentObservable,
@@ -148,6 +152,8 @@ public class PostActivity extends AppCompatActivity {
                         postArticle.hide();
                     }
                 });
+
+        compositeSubscription.add(subscription);
     }
 
     private PostService preparePost() {
@@ -162,8 +168,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void sendPost() {
-        preparePost()
-                .send()
+        Subscription postSubscription = preparePost().send()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE))
@@ -184,6 +189,8 @@ public class PostActivity extends AppCompatActivity {
                         Snackbar.make(rootLayout, postConfirmation.getMessage(), Snackbar.LENGTH_LONG).show();
                     }
                 });
+
+        compositeSubscription.add(postSubscription);
     }
 
     private void saveInDraft() {
@@ -211,7 +218,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void savePost() {
-        db.insertDraft(preparePost())
+        Subscription postSubsciprion = db.insertDraft(preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
@@ -219,6 +226,8 @@ public class PostActivity extends AppCompatActivity {
                     draftUri = uri;
                     queryHandler(uri != null);
                 }, throwableHandler);
+
+        compositeSubscription.add(postSubsciprion);
     }
 
     private void updatePost() {
@@ -230,13 +239,15 @@ public class PostActivity extends AppCompatActivity {
             return;
         }
 
-        db.updateDraft(draftUri, preparePost())
+        Subscription postSubscription = db.updateDraft(draftUri, preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
                 .subscribe(rows -> {
                     queryHandler(rows != 0);
                 }, throwableHandler);
+
+        compositeSubscription.add(postSubscription);
     }
 
     private void deleteDraft() {
@@ -248,7 +259,7 @@ public class PostActivity extends AppCompatActivity {
             return;
         }
 
-        db.deleteUri(draftUri)
+        Subscription postSubscription = db.deleteUri(draftUri)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
@@ -271,6 +282,8 @@ public class PostActivity extends AppCompatActivity {
                         Log.d(TAG, "Post Delete Failed");
                     }
                 }, throwableHandler);
+
+        compositeSubscription.add(postSubscription);
     }
 
     private void loadImage() {
@@ -350,5 +363,12 @@ public class PostActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_post, menu);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
     }
 }
