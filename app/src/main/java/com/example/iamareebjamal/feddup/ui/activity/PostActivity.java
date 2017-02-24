@@ -54,6 +54,7 @@ import rx.subscriptions.CompositeSubscription;
 public class PostActivity extends AppCompatActivity {
 
     private static final String TAG = "PostActivity";
+    private static final String IMAGE_TAG = "image";
     private static final int PICK_IMAGE = 34;
     private String filePath;
     private Uri draftUri;
@@ -364,23 +365,23 @@ public class PostActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putString("image", filePath);
-        Log.d("Image", "Image : " + filePath);
+        outState.putString(IMAGE_TAG, filePath);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        if(savedInstanceState != null) filePath = savedInstanceState.getString("image");
+        filePath = savedInstanceState.getString(IMAGE_TAG);
 
-        if(filePath != null) {
-            Picasso.with(this)
-                    .load(new File(filePath))
-                    .fit()
-                    .centerCrop()
-                    .into(postImage);
-        }
+        if(filePath == null)
+            return;
+
+        Picasso.with(this)
+                .load(new File(filePath))
+                .fit()
+                .centerCrop()
+                .into(postImage);
 
     }
 

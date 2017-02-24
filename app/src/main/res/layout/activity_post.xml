@@ -29,6 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:contentDescription="@null"
+        android:background="@color/grey"
+        app:srcCompat="@drawable/ic_photo"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <LinearLayout
