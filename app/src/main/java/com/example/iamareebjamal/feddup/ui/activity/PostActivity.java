@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.utils.DraftsHelper;
+import com.example.iamareebjamal.feddup.data.db.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 import com.example.iamareebjamal.feddup.utils.ErrorUtils;
 import com.example.iamareebjamal.feddup.utils.Utils;

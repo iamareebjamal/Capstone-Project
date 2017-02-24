@@ -28,14 +28,14 @@
             android:theme="@style/AppTheme.Detail" />
 
         <provider
-            android:name=".data.db.generated.DatabaseProvider"
+            android:name=".data.db.provider.DatabaseProvider"
             android:authorities="iamareebjamal.feddup.DatabaseProvider"
             android:exported="false" />
 
         <activity
             android:name=".ui.activity.DraftsActivity"
             android:label="@string/title_activity_drafts"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

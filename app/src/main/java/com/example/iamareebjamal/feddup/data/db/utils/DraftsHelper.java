@@ -1,4 +1,4 @@
-package com.example.iamareebjamal.feddup.data.utils;
+package com.example.iamareebjamal.feddup.data.db.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
