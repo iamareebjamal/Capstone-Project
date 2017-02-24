@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
+import com.example.iamareebjamal.feddup.data.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.ui.activity.PostActivity;
@@ -81,7 +81,7 @@ public class DraftHolder extends RecyclerView.ViewHolder {
         }
 
         delete.setOnClickListener(view ->
-            new DatabaseHelper(context).deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
+            new DraftsHelper(context).deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(rows -> {

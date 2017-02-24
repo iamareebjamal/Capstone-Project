@@ -13,7 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
+import com.example.iamareebjamal.feddup.data.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
@@ -33,7 +33,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.draft_list) RecyclerView recyclerView;
 
-    private DatabaseHelper db = new DatabaseHelper(this);
+    private DraftsHelper db = new DraftsHelper(this);
     private Cursor cursor;
 
     private List<PostDraft> drafts = new ArrayList<>();

@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
+import com.example.iamareebjamal.feddup.data.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 import com.example.iamareebjamal.feddup.utils.ErrorUtils;
 import com.example.iamareebjamal.feddup.utils.Utils;
@@ -64,7 +64,7 @@ public class PostActivity extends AppCompatActivity {
     private String filePath;
     private Uri draftUri;
 
-    private DatabaseHelper db = new DatabaseHelper(this);
+    private DraftsHelper db = new DraftsHelper(this);
 
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
