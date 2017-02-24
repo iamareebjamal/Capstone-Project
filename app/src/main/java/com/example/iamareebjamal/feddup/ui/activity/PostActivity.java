@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.iamareebjamal.feddup.api.PostService;
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 import com.example.iamareebjamal.feddup.utils.ErrorUtils;
 import com.example.iamareebjamal.feddup.utils.Utils;
@@ -42,15 +43,19 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 public class PostActivity extends AppCompatActivity {
 
+    private static final String TAG = "PostActivity";
     private static final int PICK_IMAGE = 34;
     private String filePath;
+    private Uri draftUri;
+
+    private DatabaseHelper db = new DatabaseHelper(this);
 
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
@@ -67,6 +72,11 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.progress) ProgressBar progressBar;
 
     PublishSubject<Boolean> created = PublishSubject.create();
+
+    Action1<Throwable> throwableHandler = (throwable) -> {
+        progressBar.setVisibility(View.GONE);
+        Log.d(TAG, throwable.getMessage());
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,33 +185,56 @@ public class PostActivity extends AppCompatActivity {
                 });
     }
 
+    private void saveInDraft() {
+        if(draftUri == null) savePost(); else updatePost();
+    }
+
+    private void queryHandler(boolean condition) {
+        progressBar.setVisibility(View.GONE);
+        if(condition) {
+
+            Snackbar.make(rootLayout, "Post Saved", Snackbar.LENGTH_LONG)
+                    .setAction("Undo", view -> deleteDraft(draftUri))
+                    .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                    .show();
+
+            Log.d(TAG, "Post Created : " + draftUri.toString());
+        } else {
+            Snackbar.make(rootLayout, "Saving Post Failed", Snackbar.LENGTH_LONG)
+                    .setAction("Retry", view -> saveInDraft())
+                    .show();
+
+            Log.d(TAG, "Post Save Failed");
+        }
+    }
+
     private void savePost() {
-        Log.d("LOL", "Start");
-        preparePost()
-                .save(this)
+        db.insertDraft(preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
                 .subscribe(uri -> {
-                    progressBar.setVisibility(View.GONE);
-                    if(uri != null) {
-                        Snackbar.make(rootLayout, "Post Saved", Snackbar.LENGTH_LONG)
-                                .setAction("Undo", view -> deleteDraft(uri))
-                                .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                                .show();
+                    draftUri = uri;
+                    queryHandler(uri != null);
+                }, throwableHandler);
+    }
 
-                        Log.d("LOL", uri.toString());
-                    } else {
-                        Snackbar.make(rootLayout, "Saving Post Failed", Snackbar.LENGTH_LONG)
-                                .setAction("Retry", view -> savePost())
-                                .show();
+    private void updatePost() {
+        if(draftUri == null) {
+            Snackbar.make(rootLayout, "Error updating Draft. Create new?", Snackbar.LENGTH_LONG)
+                    .setAction("Yes", view -> savePost())
+                    .show();
 
-                        Log.d("LOL", "null");
-                    }
-                }, throwable -> {
-                    progressBar.setVisibility(View.GONE);
-                    Log.d("LOL", throwable.getMessage());
-                });
+            return;
+        }
+
+        db.updateDraft(draftUri, preparePost())
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .subscribe(rows -> {
+                    queryHandler(rows != 0);
+                }, throwableHandler);
     }
 
     private void deleteDraft(Uri uri) {
@@ -273,7 +306,7 @@ public class PostActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
             case R.id.save:
-                savePost();
+                saveInDraft();
                 break;
             default:
                 // Do nothing

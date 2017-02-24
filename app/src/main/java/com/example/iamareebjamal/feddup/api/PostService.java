@@ -35,6 +35,22 @@ public class PostService {
         this.filePath = filePath;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
     public Observable<PostConfirmation> send() {
         File file = new File(filePath);
 
@@ -45,10 +61,5 @@ public class PostService {
         RequestBody content = RequestBody.create(MediaType.parse("text/plain"), this.content);
 
         return FeddupApi.getFeddupService().post(body, title, user, content);
-    }
-
-    public Observable<Uri> save(Context context) {
-        return DatabaseHelper
-                .insertDraft(context, title, author, content, filePath);
     }
 }
