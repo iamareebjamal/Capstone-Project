@@ -42,28 +42,12 @@
                 tools:text="Title"/>
 
             <ImageView
-                android:id="@+id/downvote"
+                android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_thumb_down_outline"/>
-
-            <TextView
-                android:id="@+id/downvotes"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textDark"
-                tools:text="-30"/>
-
-
-            <ImageView
-                android:id="@+id/favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_heart_outline"/>
+                app:srcCompat="@drawable/ic_delete"/>
 
         </LinearLayout>
-
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

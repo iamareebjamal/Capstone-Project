@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -27,7 +28,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.iamareebjamal.feddup.api.PostService;
+import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
+import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
@@ -97,7 +99,45 @@ public class PostActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
+        handleIntentExtras();
+
         setupForm();
+    }
+
+    private void handleIntentExtras() {
+        Intent extras = getIntent();
+        if(extras == null) return;
+
+        int id = extras.getIntExtra(PostDraft.ID, -1);
+        if(id != -1) draftUri = DatabaseProvider.Drafts.withId(id);
+
+        String title = extras.getStringExtra(PostDraft.TITLE);
+        String author = extras.getStringExtra(PostDraft.AUTHOR);
+        String content = extras.getStringExtra(PostDraft.CONTENT);
+        String filePath = extras.getStringExtra(PostDraft.FILE_PATH);
+
+        if(title != null) title_text.setText(title);
+        if(author != null) user_text.setText(author);
+        if(content != null) content_text.setText(content);
+
+        if(filePath != null) {
+            this.filePath = filePath;
+            imageLoaded();
+        }
+    }
+
+    private void imageLoaded() {
+        if(filePath == null)
+            return;
+
+        Picasso.with(this)
+                .load(new File(filePath))
+                .fit()
+                .centerCrop()
+                .placeholder(VectorDrawableCompat.create(getResources(), R.drawable.ic_photo, null))
+                .into(postImage);
+
+        created.onNext(true);
     }
 
     private Observable<Boolean> formValidObservable(TextView textView, TextInputLayout textInputLayout, int lower_bound, int upper_bound) {
@@ -149,15 +189,15 @@ public class PostActivity extends AppCompatActivity {
         compositeSubscription.add(subscription);
     }
 
-    private PostService preparePost() {
-        PostService postService = new PostService();
+    private PostDraft preparePost() {
+        PostDraft postDraft = new PostDraft();
 
-        postService.setTitle(title_text.getText().toString());
-        postService.setAuthor(user_text.getText().toString());
-        postService.setContent(content_text.getText().toString());
-        postService.setFilePath(filePath);
+        postDraft.setTitle(title_text.getText().toString());
+        postDraft.setAuthor(user_text.getText().toString());
+        postDraft.setContent(content_text.getText().toString());
+        postDraft.setFilePath(filePath);
 
-        return postService;
+        return postDraft;
     }
 
     @OnClick(R.id.post)
@@ -304,14 +344,8 @@ public class PostActivity extends AppCompatActivity {
 
             Uri fileUri = data.getData();
 
-            Picasso.with(this)
-                    .load(fileUri)
-                    .fit()
-                    .centerCrop()
-                    .into(postImage);
-
             filePath = Utils.getFilePath(this, fileUri);
-            created.onNext(true);
+            imageLoaded();
         }
     }
 
@@ -383,12 +417,7 @@ public class PostActivity extends AppCompatActivity {
         if(filePath == null)
             return;
 
-        Picasso.with(this)
-                .load(new File(filePath))
-                .fit()
-                .centerCrop()
-                .into(postImage);
-
+        imageLoaded();
     }
 
     @Override

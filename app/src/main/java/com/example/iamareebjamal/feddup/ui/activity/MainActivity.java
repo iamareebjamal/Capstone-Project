@@ -7,13 +7,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.viewholder.PostHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -23,19 +21,12 @@ import com.google.firebase.database.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(com.example.iamareebjamal.feddup.R.id.toolbar)
-    Toolbar mToolbar;
-
-    @BindView(R.id.post_list)
-    RecyclerView mRecyclerView;
-
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
+    @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.post_list) RecyclerView recyclerView;
+    @BindView(R.id.fab) FloatingActionButton fab;
 
     FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
 
@@ -46,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        setSupportActionBar(mToolbar);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        setSupportActionBar(toolbar);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         setupList();
     }
@@ -63,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mRecyclerView.setAdapter(postAdapter);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recyclerView.setAdapter(postAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 if (dy > 0 ||dy<0 && fab.isShown())
@@ -83,16 +74,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDrafts() {
-        DatabaseHelper db = new DatabaseHelper(this);
-
-        db.getDrafts()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(postService -> {
-                    Log.d("Loaded", postService.toString());
-                }, throwable ->  {
-                    Log.d("Loaded", throwable.getMessage());
-                });
+        startActivity(new Intent(this, DraftsActivity.class));
     }
 
     @OnClick(R.id.fab)

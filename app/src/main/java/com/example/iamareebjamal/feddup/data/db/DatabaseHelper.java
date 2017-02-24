@@ -4,8 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
-import com.example.iamareebjamal.feddup.api.PostService;
+import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
 
 import rx.Observable;
@@ -18,8 +19,37 @@ public class DatabaseHelper {
         this.context = context;
     }
 
-    public Observable<PostService> getDrafts() {
+
+    public Observable<PostDraft> getDraftsFromCursor(Cursor cursor) {
         return Observable.create(subscriber -> {
+            if (cursor != null) {
+                cursor.moveToFirst();
+
+                do {
+
+                    int id = cursor.getInt(cursor.getColumnIndex(DraftColumns._ID));
+                    String title = cursor.getString(cursor.getColumnIndex(DraftColumns.title));
+                    String author = cursor.getString(cursor.getColumnIndex(DraftColumns.author));
+                    String content = cursor.getString(cursor.getColumnIndex(DraftColumns.content));
+                    String filePath = cursor.getString(cursor.getColumnIndex(DraftColumns.filePath));
+
+                    PostDraft postDraft = new PostDraft();
+                    postDraft.setId(id);
+                    postDraft.setTitle(title);
+                    postDraft.setAuthor(author);
+                    postDraft.setContent(content);
+                    postDraft.setFilePath(filePath);
+
+                    subscriber.onNext(postDraft);
+                } while (cursor.moveToNext());
+            }
+
+            subscriber.onCompleted();
+        });
+    }
+
+    public Observable<PostDraft> getDrafts() {
+        return Observable.defer(() -> {
             Cursor cursor = context.getContentResolver().query(
                     DatabaseProvider.Drafts.CONTENT_URI,
                     null,
@@ -27,40 +57,19 @@ public class DatabaseHelper {
                     null,
                     null);
 
-            if (cursor != null) {
-                cursor.moveToFirst();
-
-                do {
-
-                    String title = cursor.getString(cursor.getColumnIndex(DraftColumns.title));
-                    String author = cursor.getString(cursor.getColumnIndex(DraftColumns.author));
-                    String content = cursor.getString(cursor.getColumnIndex(DraftColumns.content));
-                    String filePath = cursor.getString(cursor.getColumnIndex(DraftColumns.filePath));
-
-                    PostService postService = new PostService();
-                    postService.setTitle(title);
-                    postService.setAuthor(author);
-                    postService.setContent(content);
-                    postService.setFilePath(filePath);
-
-                    subscriber.onNext(postService);
-                } while (cursor.moveToNext());
-
-                cursor.close();
-            }
-
-            subscriber.onCompleted();
+            return getDraftsFromCursor(cursor);
         });
     }
 
-    public Observable<Uri> insertDraft(PostService postService) {
+    public Observable<Uri> insertDraft(PostDraft postDraft) {
 
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
-            values.put(DraftColumns.title, postService.getTitle());
-            values.put(DraftColumns.author, postService.getAuthor());
-            values.put(DraftColumns.content, postService.getContent());
-            values.put(DraftColumns.filePath, postService.getFilePath());
+            values.put(DraftColumns.title, postDraft.getTitle());
+            values.put(DraftColumns.author, postDraft.getAuthor());
+            values.put(DraftColumns.content, postDraft.getContent());
+            values.put(DraftColumns.filePath, postDraft.getFilePath());
+
             Uri uri = context.getContentResolver().insert(DatabaseProvider.Drafts.CONTENT_URI, values);
 
             subscriber.onNext(uri);
@@ -68,13 +77,30 @@ public class DatabaseHelper {
         });
     }
 
-    public Observable<Integer> updateDraft(Uri draftUri, PostService postService) {
+    /* Extremely hacky method for development mode only */
+    public Observable<Uri> insertDraft(String... args) {
+
+        PostDraft postDraft = new PostDraft();
+
+        try {
+            postDraft.setTitle(args[0]);
+            postDraft.setAuthor(args[1]);
+            postDraft.setContent(args[2]);
+            postDraft.setFilePath(args[3]);
+        } catch (IndexOutOfBoundsException ioe) {
+            Log.d("DB", "Completed on Exception");
+        }
+
+        return insertDraft(postDraft);
+    }
+
+    public Observable<Integer> updateDraft(Uri draftUri, PostDraft postDraft) {
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
-            values.put(DraftColumns.title, postService.getTitle());
-            values.put(DraftColumns.author, postService.getAuthor());
-            values.put(DraftColumns.content, postService.getContent());
-            values.put(DraftColumns.filePath, postService.getFilePath());
+            values.put(DraftColumns.title, postDraft.getTitle());
+            values.put(DraftColumns.author, postDraft.getAuthor());
+            values.put(DraftColumns.content, postDraft.getContent());
+            values.put(DraftColumns.filePath, postDraft.getFilePath());
 
             int rows = context.getContentResolver().update(draftUri, values, null, null);
 

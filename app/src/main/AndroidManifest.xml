@@ -5,8 +5,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:allowBackup="true"
         android:name=".FeddupApp"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -22,7 +22,6 @@
             android:name=".ui.activity.PostActivity"
             android:label="Create Post"
             android:theme="@style/AppTheme.Post" />
-
         <activity
             android:name=".ui.activity.DetailActivity"
             android:label=""
@@ -32,6 +31,11 @@
             android:name=".data.db.generated.DatabaseProvider"
             android:authorities="iamareebjamal.feddup.DatabaseProvider"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.DraftsActivity"
+            android:label="@string/title_activity_drafts"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

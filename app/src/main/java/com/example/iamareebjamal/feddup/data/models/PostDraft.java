@@ -1,6 +1,6 @@
-package com.example.iamareebjamal.feddup.api;
+package com.example.iamareebjamal.feddup.data.models;
 
-import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
+import com.example.iamareebjamal.feddup.api.FeddupApi;
 
 import java.io.File;
 
@@ -9,11 +9,22 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 
-public class PostService {
+public class PostDraft {
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String AUTHOR = "author";
+    public static final String CONTENT = "content";
+    public static final String FILE_PATH = "file_path";
+
+    private int id;
     private String title;
     private String author;
     private String content;
     private String filePath;
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public void setTitle(String title) {
         this.title = title;
@@ -29,6 +40,10 @@ public class PostService {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -61,7 +76,7 @@ public class PostService {
 
     @Override
     public String toString() {
-        return "PostService{" +
+        return "PostDraft{" +
                 "title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", content='" + content + '\'' +
