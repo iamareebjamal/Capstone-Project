@@ -98,6 +98,7 @@ public class DetailFragment extends Fragment {
                 Post post = dataSnapshot.getValue(Post.class);
 
                 if (post == null) {
+                    progressBar.setVisibility(View.GONE);
                     Snackbar.make(rootLayout, "Post Deleted", Snackbar.LENGTH_INDEFINITE).show();
                     detailView.setVisibility(View.GONE);
 
