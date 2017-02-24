@@ -52,7 +52,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
-                app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -60,8 +59,10 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/detail_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -81,99 +82,60 @@
                 android:paddingRight="10dp"
                 android:paddingTop="20dp">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/article_title"
+                    style="?android:attr/textAppearanceLarge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:drawableLeft="@drawable/ic_pen"
+                    android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_pen"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="#bbffffff"
+                    tools:text="A brief about Material Design" />
 
-                    <ImageView
-                        android:id="@+id/title_photo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:padding="5dp"
-                        app:srcCompat="@drawable/ic_pen" />
-
-                    <TextView
-                        android:id="@+id/article_title"
-                        style="?android:attr/textAppearanceLarge"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
-                        android:textColor="#bbffffff"
-                        android:text="A brief about Material Design" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/date"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:drawableLeft="@drawable/ic_time"
+                    android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_time"
+                    android:textColor="#8fff"
+                    tools:text="5:52 PM, 25th January 2016" />
 
-                    <ImageView
-                        android:id="@+id/date_photo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:padding="5dp"
-                        app:srcCompat="@drawable/ic_time" />
 
-                    <TextView
-                        android:id="@+id/date"
-                        style="?android:attr/textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#8fff"
-                        android:text="5:52 PM, 25th January 2016" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/author"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:drawableLeft="@drawable/ic_face"
+                    android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_face"
+                    android:textColor="#8fff"
+                    android:textStyle="italic"
+                    tools:text="iamareebjamal" />
 
-                    <ImageView
-                        android:id="@+id/author_photo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:padding="5dp"
-                        app:srcCompat="@drawable/ic_face" />
-
-                    <TextView
-                        android:id="@+id/author"
-                        style="?android:attr/textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#8fff"
-                        android:textStyle="italic"
-                        android:text="iamareebjamal" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/downvotes"
+                    style="?android:attr/textAppearanceSmall"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/downvote_iphoto"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:padding="5dp"
-                        app:srcCompat="@drawable/ic_thumb_down_outline" />
-
-                    <TextView
-                        android:id="@+id/downvotes"
-                        style="?android:attr/textAppearanceSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="#8fff"
-                        android:text="-6" />
-                </LinearLayout>
+                    android:drawableLeft="@drawable/ic_thumb_down_outline"
+                    android:drawablePadding="10dp"
+                    android:drawableStart="@drawable/ic_thumb_down_outline"
+                    android:textColor="#8fff"
+                    tools:text="-6" />
 
 
             </LinearLayout>
@@ -183,11 +145,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="We challenged ourselves to create a visual language for our users that synthesizes the classic principles of good design with the innovation and possibility of technology and science. This is material design. This spec is a living document that will be updated as we continue to develop the tenets and specifics of material design."/>
+                tools:text="We challenged ourselves to create a visual language for our users that synthesizes the classic principles of good design with the innovation and possibility of technology and science. This is material design. This spec is a living document that will be updated as we continue to develop the tenets and specifics of material design." />
 
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="100dp"
+        android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.activity.DetailActivity;
+import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -60,11 +61,12 @@ public class PostHolder extends RecyclerView.ViewHolder {
                 .load(post.url)
                 .fit()
                 .centerCrop()
+                .placeholder(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_photo, null))
                 .into(image, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
-                        Palette.from(bitmap).maximumColorCount(16).generate(palette -> {
+                        Palette.from(bitmap).generate(palette -> {
                             Palette.Swatch swatch = palette.getVibrantSwatch();
                             if(swatch != null) {
                                 titleBar.setBackgroundColor(swatch.getRgb());
@@ -78,6 +80,11 @@ public class PostHolder extends RecyclerView.ViewHolder {
                     }
                 });
 
-        panel.setOnClickListener(view -> context.startActivity(new Intent(context, DetailActivity.class)));
+        panel.setOnClickListener(view -> {
+            Intent intent = new Intent(context, DetailActivity.class);
+            intent.putExtra(DetailFragment.KEY, reference.getKey());
+
+            context.startActivity(intent);
+        });
     }
 }
