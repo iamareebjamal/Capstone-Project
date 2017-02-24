@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -63,11 +64,11 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.image) FloatingActionButton loadImage;
     @BindView(R.id.post) FloatingActionButton postArticle;
 
-    @BindView(R.id.title) EditText title_text;
+    @BindView(R.id.title) TextInputEditText title_text;
     @BindView(R.id.title_wrapper) TextInputLayout title_wrapper;
-    @BindView(R.id.user) EditText user_text;
+    @BindView(R.id.user) TextInputEditText user_text;
     @BindView(R.id.user_wrapper) TextInputLayout user_wrapper;
-    @BindView(R.id.content) EditText content_text;
+    @BindView(R.id.content) TextInputEditText content_text;
     @BindView(R.id.content_wrapper) TextInputLayout content_wrapper;
     @BindView(R.id.progress) ProgressBar progressBar;
 

@@ -31,7 +31,7 @@
         <provider
             android:name=".data.db.generated.DatabaseProvider"
             android:authorities="iamareebjamal.feddup.DatabaseProvider"
-            android:exported="true" />
+            android:exported="false" />
     </application>
 
 </manifest>
