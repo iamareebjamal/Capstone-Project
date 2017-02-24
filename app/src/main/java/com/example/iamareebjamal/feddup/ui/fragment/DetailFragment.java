@@ -26,6 +26,7 @@ import com.example.iamareebjamal.feddup.data.models.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -56,6 +57,8 @@ public class DetailFragment extends Fragment {
     @BindView(R.id.meta_bar) LinearLayout panel;
     @BindView(R.id.progress) ProgressBar progressBar;
 
+    private Query query;
+    private ValueEventListener valueEventListener;
 
     public DetailFragment() { }
 
@@ -91,7 +94,9 @@ public class DetailFragment extends Fragment {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        FirebaseDatabase.getInstance().getReference("posts/"+key).addValueEventListener(new ValueEventListener() {
+        query = FirebaseDatabase.getInstance().getReference("posts/"+key);
+
+        valueEventListener = query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Post post = dataSnapshot.getValue(Post.class);
@@ -153,4 +158,10 @@ public class DetailFragment extends Fragment {
                 });
     }
 
+    @Override
+    public void onDetach() {
+        if(query != null) query.removeEventListener(valueEventListener);
+
+        super.onDetach();
+    }
 }
