@@ -1,11 +1,13 @@
 package com.example.iamareebjamal.feddup.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -353,7 +355,7 @@ public class PostActivity extends AppCompatActivity {
     public void requestPermissionAndLoadImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PICK_IMAGE);
-
+            return;
         }
 
         loadImage();
@@ -362,20 +364,37 @@ public class PostActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PICK_IMAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadImage();
-            }
+        if (requestCode == PICK_IMAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            loadImage();
         }
     }
 
+    private boolean save = true;
     @Override
     public void onBackPressed() {
-        saveInDraft();
 
-        Toast.makeText(this, "Saving in Drafts", Toast.LENGTH_LONG).show();
+        Runnable close = super::onBackPressed;
 
-        super.onBackPressed();
+        final Context context = this;
+
+        Snackbar.make(rootLayout, "Saving in Drafts. Undo?", Snackbar.LENGTH_SHORT)
+                .setAction("Yes", view -> {
+                    Toast.makeText(this, "Draft Deleted", Toast.LENGTH_LONG).show();
+                    save = false;
+                    super.onBackPressed();
+                })
+                .addCallback(new BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        super.onDismissed(transientBottomBar, event);
+                        if(save) {
+                            Toast.makeText(context, "Saving in Drafts", Toast.LENGTH_SHORT).show();
+                            saveInDraft();
+                        }
+                        close.run();
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -387,6 +406,8 @@ public class PostActivity extends AppCompatActivity {
             case R.id.save:
                 saveInDraft();
                 break;
+            case R.id.delete:
+                deleteDraft();
             default:
                 // Do nothing
         }
