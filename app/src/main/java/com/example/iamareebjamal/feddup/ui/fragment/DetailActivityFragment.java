@@ -82,22 +82,19 @@ public class DetailActivityFragment extends Fragment {
                     @Override
                     public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) backdrop.getDrawable()).getBitmap();
-                        Palette.from(bitmap).maximumColorCount(16).generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                Palette.Swatch swatch = palette.getVibrantSwatch();
-                                if(swatch != null) {
-                                    panel.setBackgroundColor(swatch.getRgb());
-                                    DrawableCompat.setTint(DrawableCompat.wrap(title_icon.getDrawable()), swatch.getBodyTextColor());
-                                    DrawableCompat.setTint(DrawableCompat.wrap(date_icon.getDrawable()), swatch.getBodyTextColor());
-                                    DrawableCompat.setTint(DrawableCompat.wrap(author_icon.getDrawable()), swatch.getBodyTextColor());
-                                    DrawableCompat.setTint(DrawableCompat.wrap(downvote_icon.getDrawable()), swatch.getBodyTextColor());
+                        Palette.from(bitmap).maximumColorCount(16).generate(palette -> {
+                            Palette.Swatch swatch = palette.getVibrantSwatch();
+                            if(swatch != null) {
+                                panel.setBackgroundColor(swatch.getRgb());
+                                DrawableCompat.setTint(DrawableCompat.wrap(title_icon.getDrawable()), swatch.getBodyTextColor());
+                                DrawableCompat.setTint(DrawableCompat.wrap(date_icon.getDrawable()), swatch.getBodyTextColor());
+                                DrawableCompat.setTint(DrawableCompat.wrap(author_icon.getDrawable()), swatch.getBodyTextColor());
+                                DrawableCompat.setTint(DrawableCompat.wrap(downvote_icon.getDrawable()), swatch.getBodyTextColor());
 
-                                    title.setTextColor(swatch.getTitleTextColor());
-                                    date.setTextColor(swatch.getTitleTextColor());
-                                    author.setTextColor(swatch.getTitleTextColor());
-                                    downvotes.setTextColor(swatch.getTitleTextColor());
-                                }
+                                title.setTextColor(swatch.getTitleTextColor());
+                                date.setTextColor(swatch.getTitleTextColor());
+                                author.setTextColor(swatch.getTitleTextColor());
+                                downvotes.setTextColor(swatch.getTitleTextColor());
                             }
                         });
                     }

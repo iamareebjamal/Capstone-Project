@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.Subscription;
@@ -64,7 +65,6 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.postImage) ImageView postImage;
-    @BindView(R.id.image) FloatingActionButton loadImage;
     @BindView(R.id.post) FloatingActionButton postArticle;
 
     @BindView(R.id.title) TextInputEditText title_text;
@@ -96,9 +96,6 @@ public class PostActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-
-        loadImage.setOnClickListener(view -> requestPermissionAndLoadImage());
-        postArticle.setOnClickListener(view -> sendPost());
 
         setupForm();
     }
@@ -163,7 +160,8 @@ public class PostActivity extends AppCompatActivity {
         return postService;
     }
 
-    private void sendPost() {
+    @OnClick(R.id.post)
+    public void sendPost() {
         Subscription postSubscription = preparePost().send()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -214,7 +212,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void savePost() {
-        Subscription postSubsciprion = db.insertDraft(preparePost())
+        Subscription postSubscription = db.insertDraft(preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
@@ -223,7 +221,7 @@ public class PostActivity extends AppCompatActivity {
                     queryHandler(uri != null);
                 }, throwableHandler);
 
-        compositeSubscription.add(postSubsciprion);
+        compositeSubscription.add(postSubscription);
     }
 
     private void updatePost() {
@@ -317,15 +315,14 @@ public class PostActivity extends AppCompatActivity {
         }
     }
 
-    private boolean requestPermissionAndLoadImage() {
+    @OnClick(R.id.image)
+    public void requestPermissionAndLoadImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PICK_IMAGE);
 
-            return false;
         }
 
         loadImage();
-        return true;
     }
 
     @Override
@@ -337,7 +334,6 @@ public class PostActivity extends AppCompatActivity {
             }
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

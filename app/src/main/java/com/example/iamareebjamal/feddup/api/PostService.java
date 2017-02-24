@@ -1,9 +1,5 @@
 package com.example.iamareebjamal.feddup.api;
 
-import android.content.Context;
-import android.net.Uri;
-
-import com.example.iamareebjamal.feddup.data.db.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 
 import java.io.File;

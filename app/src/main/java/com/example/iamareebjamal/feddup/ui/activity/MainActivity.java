@@ -34,11 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
 
-    static {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.fab)
-    public void newActivity(){
+    public void startPostActivity(){
         startActivity(new Intent(this, PostActivity.class));
     }
 
@@ -95,29 +90,4 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
-    /*@OnClick(R.id.postButton)
-    public void setPostButton(){
-        File file = new File(Environment.getExternalStorageDirectory().getPath()+"/screencap.png");
-
-        RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);
-        final MultipartBody.Part body = MultipartBody.Part.createFormData("image", file.getName(), reqFile);
-        RequestBody title = RequestBody.create(MediaType.parse("text/plain"), "New Post");
-        RequestBody user = RequestBody.create(MediaType.parse("text/plain"), "iamareebjamal");
-        RequestBody content = RequestBody.create(MediaType.parse("text/plain"), "Ooga Booga, where all the white women at?");
-
-        FeddupApi.getFeddupService().post(body, title, user, content).enqueue(new Callback<PostConfirmation>() {
-            @Override
-            public void onResponse(Call<PostConfirmation> call, Response<PostConfirmation> response) {
-                PostConfirmation postConfirmation = response.body();
-                Toast.makeText(getApplicationContext(), postConfirmation.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("Feddup", postConfirmation.toString());
-            }
-
-            @Override
-            public void onFailure(Call<PostConfirmation> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }*/
 }

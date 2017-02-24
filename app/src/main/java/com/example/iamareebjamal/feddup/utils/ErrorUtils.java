@@ -1,7 +1,6 @@
 package com.example.iamareebjamal.feddup.utils;
 
 import com.example.iamareebjamal.feddup.api.FeddupApi;
-import com.example.iamareebjamal.feddup.api.FeddupService;
 import com.example.iamareebjamal.feddup.data.models.PostConfirmation;
 
 import java.io.IOException;
