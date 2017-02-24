@@ -25,8 +25,7 @@ public class DatabaseHelper {
             if (cursor != null) {
                 cursor.moveToFirst();
 
-                do {
-
+                while (!cursor.isAfterLast()) {
                     int id = cursor.getInt(cursor.getColumnIndex(DraftColumns._ID));
                     String title = cursor.getString(cursor.getColumnIndex(DraftColumns.title));
                     String author = cursor.getString(cursor.getColumnIndex(DraftColumns.author));
@@ -41,7 +40,10 @@ public class DatabaseHelper {
                     postDraft.setFilePath(filePath);
 
                     subscriber.onNext(postDraft);
-                } while (cursor.moveToNext());
+
+                    cursor.moveToNext();
+                }
+
             }
 
             subscriber.onCompleted();
