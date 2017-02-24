@@ -3,7 +3,6 @@ package com.example.iamareebjamal.feddup.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;

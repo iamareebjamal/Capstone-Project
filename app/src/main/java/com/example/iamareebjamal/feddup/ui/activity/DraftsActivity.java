@@ -13,9 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import com.example.iamareebjamal.feddup.R;
-import com.example.iamareebjamal.feddup.data.db.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
+import com.example.iamareebjamal.feddup.data.db.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.ui.adapter.DraftsAdapter;
 

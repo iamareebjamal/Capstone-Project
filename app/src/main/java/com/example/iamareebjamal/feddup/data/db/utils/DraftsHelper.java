@@ -7,8 +7,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
-import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
+import com.example.iamareebjamal.feddup.data.models.PostDraft;
 
 import rx.Observable;
 
