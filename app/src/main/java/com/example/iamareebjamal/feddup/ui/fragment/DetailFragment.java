@@ -95,9 +95,17 @@ public class DetailFragment extends Fragment {
         FirebaseDatabase.getInstance().getReference("posts/"+key).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                detailView.setVisibility(View.VISIBLE);
-
                 Post post = dataSnapshot.getValue(Post.class);
+
+                if (post == null) {
+                    Snackbar.make(rootLayout, "Post Deleted", Snackbar.LENGTH_INDEFINITE).show();
+                    detailView.setVisibility(View.GONE);
+
+                    backdrop.setImageDrawable(VectorDrawableCompat.create(getContext().getResources(), R.drawable.ic_photo, null));
+                    return;
+                }
+
+                detailView.setVisibility(View.VISIBLE);
                 setBackdrop(post.url);
 
                 title.setText(post.title);
