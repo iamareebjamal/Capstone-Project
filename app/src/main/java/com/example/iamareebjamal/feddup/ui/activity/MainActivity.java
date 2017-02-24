@@ -1,6 +1,7 @@
 package com.example.iamareebjamal.feddup.ui.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.icu.util.Currency;
 import android.support.design.widget.FloatingActionButton;
@@ -9,7 +10,9 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -63,9 +66,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setupList();
     }
 
+    private boolean moveUp;
     public void setupList(){
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
+
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            gridLayoutManager.setSpanCount(2);
 
         Query postReference = FirebaseDatabase.getInstance().getReference("posts").orderByChild("downvotes").limitToFirst(10);
 
@@ -80,16 +89,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-                if (dy > 0 ||dy<0 && fab.isShown())
+                if (dy > 0 || dy < 0 && fab.isShown())
                     fab.hide();
+
+                moveUp = dy < 0;
             }
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
-                if (newState == RecyclerView.SCROLL_STATE_IDLE){
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && moveUp)
                     fab.show();
-                }
+
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
@@ -182,9 +193,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 loadDownvotes();
                 break;
+            default:
+                // Do Nothing
         }
-
-
     }
 
     @Override
