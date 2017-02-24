@@ -36,6 +36,7 @@ import com.example.iamareebjamal.feddup.utils.Utils;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -94,12 +95,6 @@ public class PostActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
-
-        Picasso.with(this)
-                .load("http://netdna.webdesignerdepot.com/uploads/2015/07/featured_mdl.jpg")
-                .fit()
-                .centerCrop()
-                .into(postImage);
 
         loadImage.setOnClickListener(view -> requestPermissionAndLoadImage());
         postArticle.setOnClickListener(view -> sendPost());
@@ -363,6 +358,30 @@ public class PostActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_post, menu);
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("image", filePath);
+        Log.d("Image", "Image : " + filePath);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if(savedInstanceState != null) filePath = savedInstanceState.getString("image");
+
+        if(filePath != null) {
+            Picasso.with(this)
+                    .load(new File(filePath))
+                    .fit()
+                    .centerCrop()
+                    .into(postImage);
+        }
+
     }
 
     @Override
