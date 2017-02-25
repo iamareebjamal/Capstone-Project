@@ -1,7 +1,6 @@
 package com.example.iamareebjamal.feddup.ui.viewholder;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.graphics.drawable.VectorDrawableCompat;
@@ -19,15 +18,12 @@ import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
-import com.example.iamareebjamal.feddup.ui.activity.DetailActivity;
-import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
 import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -36,6 +32,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class PostHolder extends RecyclerView.ViewHolder {
+    public static final String TAG = "PostHolder";
+
     @BindView(R.id.rootcard) CardView panel;
     @BindView(R.id.title) TextView title;
     @BindView(R.id.downvotes) TextView downvotes;
@@ -98,28 +96,26 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
         if(favorites.contains(key)){
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));
-            favorite.setOnClickListener(view -> {
-                favoritesHelper.removeFavorite(reference.getKey())
+            favorite.setOnClickListener(view ->
+                    favoritesHelper.removeFavorite(reference.getKey())
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(rows -> {
-                            Log.d("Removed", String.valueOf(rows));
-                        }, throwable -> {
-                            Log.d("Error", throwable.getMessage());
-                        });
-            });
+                        .subscribe(rows ->
+                            Log.d("Removed", String.valueOf(rows))
+                        , throwable ->
+                            Log.d("Error", throwable.getMessage())
+                        ));
         } else {
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart_outline, null));
-            favorite.setOnClickListener(view -> {
-                favoritesHelper.addFavorite(reference.getKey())
+            favorite.setOnClickListener(view ->
+                    favoritesHelper.addFavorite(reference.getKey())
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(added -> {
-                            Log.d("Added", String.valueOf(added));
-                        }, throwable -> {
-                            Log.d("Error", throwable.getMessage());
-                        });
-            });
+                        .subscribe(added ->
+                            Log.d("Added", String.valueOf(added))
+                        , throwable ->
+                            Log.d("Error", throwable.getMessage())
+                        ));
         }
 
         if(downvoted.contains(key)){
@@ -128,8 +124,10 @@ public class PostHolder extends RecyclerView.ViewHolder {
                 downvotesHelper.removeDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(rows -> Log.d("Removed", String.valueOf(rows)),
-                                throwable -> Log.d("Error", throwable.getMessage())
+                        .subscribe(rows ->
+                            Log.d("Removed", String.valueOf(rows))
+                        , throwable ->
+                            Log.d("Error", throwable.getMessage())
                         )
             );
 
@@ -139,33 +137,38 @@ public class PostHolder extends RecyclerView.ViewHolder {
                 downvotesHelper.addDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(added -> Log.d("Added", String.valueOf(added)),
-                                throwable -> Log.d("Error", throwable.getMessage())
+                        .subscribe(added ->
+                            Log.d("Added", String.valueOf(added))
+                        , throwable ->
+                            Log.d("Error", throwable.getMessage())
                         )
             );
 
         }
+
+        Palette.PaletteAsyncListener asyncListener = palette -> {
+            Palette.Swatch swatch = palette.getVibrantSwatch();
+            if(swatch != null) {
+                titleBar.setBackgroundColor(swatch.getRgb());
+                DrawableCompat.setTint(DrawableCompat.wrap(favorite.getDrawable()), swatch.getBodyTextColor());
+                DrawableCompat.setTint(DrawableCompat.wrap(downvote.getDrawable()), swatch.getBodyTextColor());
+
+                title.setTextColor(swatch.getTitleTextColor());
+                downvotes.setTextColor(swatch.getTitleTextColor());
+            }
+        };
 
         Picasso.with(context)
                 .load(post.url)
                 .fit()
                 .centerCrop()
                 .placeholder(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_photo, null))
+                .tag(TAG)
                 .into(image, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
                         Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
-                        Palette.from(bitmap).generate(palette -> {
-                            Palette.Swatch swatch = palette.getVibrantSwatch();
-                            if(swatch != null) {
-                                titleBar.setBackgroundColor(swatch.getRgb());
-                                DrawableCompat.setTint(DrawableCompat.wrap(favorite.getDrawable()), swatch.getBodyTextColor());
-                                DrawableCompat.setTint(DrawableCompat.wrap(downvote.getDrawable()), swatch.getBodyTextColor());
-
-                                title.setTextColor(swatch.getTitleTextColor());
-                                downvotes.setTextColor(swatch.getTitleTextColor());
-                            }
-                        });
+                        Palette.from(bitmap).generate(asyncListener);
                     }
                 });
 
@@ -175,4 +178,5 @@ public class PostHolder extends RecyclerView.ViewHolder {
             fragmentInteractionListener.onPostSelect(key);
         });
     }
+
 }

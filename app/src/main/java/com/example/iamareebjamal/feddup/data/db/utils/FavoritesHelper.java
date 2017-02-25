@@ -41,7 +41,11 @@ public class FavoritesHelper {
                     null,
                     null);
 
-            return getFavoritesFromCursor(cursor);
+            Observable<String> results = getFavoritesFromCursor(cursor);
+
+            if(cursor != null) cursor.close();
+
+            return results;
         });
     }
 

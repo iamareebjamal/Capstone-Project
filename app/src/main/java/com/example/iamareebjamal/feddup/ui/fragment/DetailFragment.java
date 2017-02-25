@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
@@ -34,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.leakcanary.RefWatcher;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -248,6 +250,7 @@ public class DetailFragment extends Fragment {
         Picasso.with(getContext())
                 .load(photoUrl)
                 .placeholder(VectorDrawableCompat.create(getContext().getResources(), R.drawable.ic_photo, null))
+                .tag(TAG)
                 .into(backdrop, new Callback.EmptyCallback(){
                     @Override
                     public void onSuccess() {
@@ -267,6 +270,14 @@ public class DetailFragment extends Fragment {
         if(query != null) query.removeEventListener(valueEventListener);
         if(compositeSubscription != null) compositeSubscription.unsubscribe();
 
+        Picasso.with(getContext()).cancelTag(TAG);
+
         super.onDetach();
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 }

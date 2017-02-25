@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
@@ -26,11 +27,15 @@ import com.example.iamareebjamal.feddup.ui.viewholder.PostHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.squareup.leakcanary.RefWatcher;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "MainFragment";
@@ -45,6 +50,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private FavoritesHelper favoritesHelper;
     private DownvotesHelper downvotesHelper;
+
+    private CompositeSubscription compositeSubscription;
 
     @BindView(R.id.post_list) RecyclerView recyclerView;
     @BindView(R.id.empty_layout) FrameLayout emptyLayout;
@@ -73,6 +80,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         favoritesHelper = new FavoritesHelper(getContext());
         downvotesHelper = new DownvotesHelper(getContext());
+
+        compositeSubscription = new CompositeSubscription();
 
         getActivity().getSupportLoaderManager().initLoader(FAVORITE_LOADER, null, this);
         getActivity().getSupportLoaderManager().initLoader(DOWNVOTES_CURSOR, null, this);
@@ -137,7 +146,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if(favoriteCursor == null) return;
 
         PostHolder.clearFavorites();
-        favoritesHelper
+        Subscription subscription = favoritesHelper
                 .getFavoritesFromCursor(favoriteCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -146,13 +155,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                     postAdapter.notifyDataSetChanged();
                 }, throwable -> Log.d(TAG, "Cursor has closed"));
 
+        compositeSubscription.add(subscription);
     }
 
     private void loadDownvotes() {
         if(downvotesCursor == null) return;
 
         PostHolder.clearDownVoted();
-        downvotesHelper
+        Subscription subscription = downvotesHelper
                 .getDowvotesFromCursor(downvotesCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -161,6 +171,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                     postAdapter.notifyDataSetChanged();
                 }, throwable -> Log.d(TAG, "Cursor has closed"));
 
+        compositeSubscription.add(subscription);
     }
 
     private void onFabShow() {
@@ -190,6 +201,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        postAdapter.cleanup();
+        Picasso.with(getContext()).cancelTag(PostHolder.TAG);
+
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
     }
 
     @Override
@@ -224,8 +239,15 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(favoriteCursor != null) favoriteCursor.close();
-        if(downvotesCursor != null) downvotesCursor.close();
+        PostHolder.clearDownVoted();
+        PostHolder.clearFavorites();
+        // No need to close cursor. Handled by loader
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(getActivity());
+        refWatcher.watch(this);
     }
 
     public interface FragmentInteractionListener {

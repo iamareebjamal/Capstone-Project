@@ -18,12 +18,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
 import com.example.iamareebjamal.feddup.data.db.utils.DraftsHelper;
 import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.ui.adapter.DraftsAdapter;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,5 +151,12 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(cursor != null) cursor.close();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
+        refWatcher.watch(this);
     }
 }

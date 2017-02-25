@@ -41,7 +41,11 @@ public class DownvotesHelper {
                     null,
                     null);
 
-            return getDowvotesFromCursor(cursor);
+            Observable<String> results = getDowvotesFromCursor(cursor);
+
+            if(cursor != null) cursor.close();
+
+            return results;
         });
     }
 
@@ -56,6 +60,9 @@ public class DownvotesHelper {
                     null);
 
             subscriber.onNext(cursor!= null && cursor.getCount() > 0);
+
+            if(cursor != null) cursor.close();
+
             subscriber.onCompleted();
         });
     }

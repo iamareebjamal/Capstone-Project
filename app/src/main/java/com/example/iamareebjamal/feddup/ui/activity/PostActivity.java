@@ -32,6 +32,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.utils.DraftsHelper;
@@ -40,6 +41,7 @@ import com.example.iamareebjamal.feddup.data.models.PostDraft;
 import com.example.iamareebjamal.feddup.utils.ErrorUtils;
 import com.example.iamareebjamal.feddup.utils.Utils;
 import com.jakewharton.rxbinding.widget.RxTextView;
+import com.squareup.leakcanary.RefWatcher;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -454,7 +456,9 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         if(compositeSubscription != null) compositeSubscription.unsubscribe();
+
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
+        refWatcher.watch(this);
     }
 }

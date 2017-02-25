@@ -12,9 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
 import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
+import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -82,6 +84,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
+        refWatcher.watch(this);
     }
 
     @Override

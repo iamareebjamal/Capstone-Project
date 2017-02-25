@@ -6,8 +6,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
+import com.squareup.leakcanary.RefWatcher;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -44,6 +46,13 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
+        refWatcher.watch(this);
     }
 
 }
