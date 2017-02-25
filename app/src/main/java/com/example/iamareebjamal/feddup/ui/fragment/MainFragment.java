@@ -104,7 +104,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
                 if(!started) {
                     started = true;
-                    if (mListener != null) mListener.onPostSelect(key);
+                    if (mListener != null) mListener.onPostStart(key);
                     emptyLayout.setVisibility(View.GONE);
                 }
 
