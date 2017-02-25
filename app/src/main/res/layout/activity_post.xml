@@ -20,7 +20,7 @@
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat"
-            android:theme="@style/ActionBarThemeOverlay" />
+            android:theme="@style/ActionBarThemeOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
 
@@ -33,11 +33,15 @@
         app:srcCompat="@drawable/ic_photo"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <LinearLayout
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/parentPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="260dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -135,6 +139,7 @@
         </LinearLayout>
 
     </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/post"
