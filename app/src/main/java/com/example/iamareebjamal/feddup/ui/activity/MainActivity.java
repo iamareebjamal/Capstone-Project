@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,6 +37,8 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String TAG = "MainActivity";
+
     private static final int FAVORITE_LOADER = 1;
     private static final int DOWNVOTES_CURSOR = 2;
 
@@ -44,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private FavoritesHelper favoritesHelper = new FavoritesHelper(this);
     private DownvotesHelper downvotesHelper = new DownvotesHelper(this);
-
-    private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.post_list) RecyclerView recyclerView;
@@ -111,32 +112,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(favoriteCursor == null) return;
 
         PostHolder.clearFavorites();
-        Subscription favoritesSubscription = favoritesHelper
+        favoritesHelper
                 .getFavoritesFromCursor(favoriteCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(key -> {
                     PostHolder.addFavorite(key);
                     postAdapter.notifyDataSetChanged();
-                });
+                }, throwable -> Log.d(TAG, "Cursor has closed"));
 
-        compositeSubscription.add(favoritesSubscription);
     }
 
     private void loadDownvotes() {
         if(downvotesCursor == null) return;
 
         PostHolder.clearDownVoted();
-        Subscription downvotesSubscription = downvotesHelper
+        downvotesHelper
                 .getDowvotesFromCursor(downvotesCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(key -> {
                     PostHolder.addDownVoted(key);
                     postAdapter.notifyDataSetChanged();
-                });
+                }, throwable -> Log.d(TAG, "Cursor has closed"));
 
-        compositeSubscription.add(downvotesSubscription);
     }
 
 
@@ -170,16 +169,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        if(favoriteCursor != null) favoriteCursor.close();
-        if(downvotesCursor != null) downvotesCursor.close();
-
-        if(compositeSubscription != null) compositeSubscription.unsubscribe();
-
-        super.onDestroy();
     }
 
     @Override
