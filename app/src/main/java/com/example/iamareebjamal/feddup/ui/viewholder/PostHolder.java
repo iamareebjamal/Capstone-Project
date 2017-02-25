@@ -26,8 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,8 +48,8 @@ public class PostHolder extends RecyclerView.ViewHolder {
     private FavoritesHelper favoritesHelper;
     private DownvotesHelper downvotesHelper;
 
-    private static List<String> downvoted= new ArrayList<>();
-    private static List<String> favorites = new ArrayList<>();
+    private static Set<String> downvoted= new HashSet<>();
+    private static Set<String> favorites = new HashSet<>();
     private static MainFragment.FragmentInteractionListener fragmentInteractionListener;
 
     public PostHolder(View itemView) {
@@ -60,7 +61,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         downvotesHelper = new DownvotesHelper(context);
     }
 
-    public static void setDownvoted(List<String> downvoted) {
+    public static void setDownvoted(Set<String> downvoted) {
         PostHolder.downvoted = downvoted;
     }
 
@@ -72,7 +73,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         downvoted.clear();
     }
 
-    public static void setFavorites(List<String> favorites) {
+    public static void setFavorites(Set<String> favorites) {
         PostHolder.favorites = favorites;
     }
 

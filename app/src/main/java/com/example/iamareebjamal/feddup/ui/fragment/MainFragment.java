@@ -100,9 +100,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         postAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(Post.class, R.layout.item_card, PostHolder.class, postReference) {
             @Override
             protected void populateViewHolder(PostHolder viewHolder, Post post, int position) {
+                String key = getRef(position).getKey();
+
                 if(!started) {
                     started = true;
-                    if (mListener != null) mListener.onPostSelect(getRef(position).getKey());
+                    if (mListener != null) mListener.onPostSelect(key);
                     emptyLayout.setVisibility(View.GONE);
                 }
 
