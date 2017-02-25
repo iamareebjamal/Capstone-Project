@@ -124,30 +124,26 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
         if(downvoted.contains(key)){
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down, null));
-            downvote.setOnClickListener(view -> {
-                downvotesHelper.removeDownvote(reference.getKey())
+            downvote.setOnClickListener(view ->
+                downvotesHelper.removeDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(rows -> {
-                            reference.child("downvotes").setValue(post.downvotes-1);
-                            Log.d("Removed", String.valueOf(rows));
-                        }, throwable -> {
-                            Log.d("Error", throwable.getMessage());
-                        });
-            });
+                        .subscribe(rows -> Log.d("Removed", String.valueOf(rows)),
+                                throwable -> Log.d("Error", throwable.getMessage())
+                        )
+            );
+
         } else {
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down_outline, null));
-            downvote.setOnClickListener(view -> {
-                downvotesHelper.addDownvote(reference.getKey())
+            downvote.setOnClickListener(view ->
+                downvotesHelper.addDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(added -> {
-                            reference.child("downvotes").setValue(post.downvotes+1);
-                            Log.d("Added", String.valueOf(added));
-                        }, throwable -> {
-                            Log.d("Error", throwable.getMessage());
-                        });
-            });
+                        .subscribe(added -> Log.d("Added", String.valueOf(added)),
+                                throwable -> Log.d("Error", throwable.getMessage())
+                        )
+            );
+
         }
 
         Picasso.with(context)

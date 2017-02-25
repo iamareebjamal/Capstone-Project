@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +44,11 @@ import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class DetailFragment extends Fragment {
 
@@ -65,7 +72,11 @@ public class DetailFragment extends Fragment {
     @BindView(R.id.empty_layout) FrameLayout emptyLayout;
 
     private Query query;
+    private Post post;
     private ValueEventListener valueEventListener;
+    private DownvotesHelper downvotesHelper;
+
+    private CompositeSubscription compositeSubscription;
 
     public DetailFragment() { }
 
@@ -79,6 +90,13 @@ public class DetailFragment extends Fragment {
 
         downvote.hide();
         return root;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        downvotesHelper = new DownvotesHelper(getContext());
     }
 
     public Toolbar getToolbar() {
@@ -96,6 +114,11 @@ public class DetailFragment extends Fragment {
     public void setKey(String key) {
         this.key = key;
         emptyLayout.setVisibility(View.GONE);
+
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+
+        compositeSubscription = new CompositeSubscription();
+
         loadArticle();
     }
 
@@ -114,7 +137,7 @@ public class DetailFragment extends Fragment {
         valueEventListener = query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Post post = dataSnapshot.getValue(Post.class);
+                post = dataSnapshot.getValue(Post.class);
 
                 if (post == null) {
                     progressBar.setVisibility(View.GONE);
@@ -135,6 +158,8 @@ public class DetailFragment extends Fragment {
                 body.setText(post.content);
                 downvotes.setText(String.valueOf(post.downvotes));
                 date.setText(getDateTime(post.time));
+
+                loadArticleStatus(key);
             }
 
             @Override
@@ -144,6 +169,52 @@ public class DetailFragment extends Fragment {
             }
         });
 
+    }
+
+    private Action1<Throwable> throwableHandler = throwable ->
+            Log.d(TAG, "Error " + throwable.getMessage());
+
+    private View.OnClickListener addDownvote = view -> {
+        if(post == null) return;
+
+        Subscription subscription = downvotesHelper.addDownvote(key, post.downvotes)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(uri -> Log.d(TAG, "Added " + uri), throwableHandler);
+
+        compositeSubscription.add(subscription);
+    };
+
+    private View.OnClickListener removeDownvote = view -> {
+        if(post == null) return;
+
+        Subscription subscription = downvotesHelper.removeDownvote(key, post.downvotes)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(rows -> Log.d(TAG, "Removed " + rows), throwableHandler);
+
+        compositeSubscription.add(subscription);
+    };
+
+    private void loadArticleStatus(String key) {
+        Subscription dbSubscription = downvotesHelper.isDownvoted(key)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(downvoted -> {
+                    if(downvoted) {
+                        downvote.setImageDrawable(VectorDrawableCompat
+                                .create(getResources(), R.drawable.ic_thumb_down_outline, null));
+
+                        downvote.setOnClickListener(removeDownvote);
+                    } else {
+                        downvote.setImageDrawable(VectorDrawableCompat
+                                .create(getResources(), R.drawable.ic_thumb_down, null));
+
+                        downvote.setOnClickListener(addDownvote);
+                    }
+                }, throwableHandler);
+
+        compositeSubscription.add(dbSubscription);
     }
 
     public static int getDarkColor(int color) {
@@ -196,6 +267,7 @@ public class DetailFragment extends Fragment {
     @Override
     public void onDetach() {
         if(query != null) query.removeEventListener(valueEventListener);
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
 
         super.onDetach();
     }
