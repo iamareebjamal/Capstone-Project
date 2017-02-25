@@ -21,6 +21,7 @@ import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.activity.DetailActivity;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
+import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
 import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -48,6 +49,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
     private static List<String> downvoted= new ArrayList<>();
     private static List<String> favorites = new ArrayList<>();
+    private static MainFragment.FragmentInteractionListener fragmentInteractionListener;
 
     public PostHolder(View itemView) {
         super(itemView);
@@ -80,6 +82,11 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
     public static void clearFavorites() {
         favorites.clear();
+    }
+
+    public static void setFragmentInteractionListener(MainFragment.FragmentInteractionListener
+                                                              fragmentInteractionListener) {
+        PostHolder.fragmentInteractionListener = fragmentInteractionListener;
     }
 
     public void setPost(final Post post, final DatabaseReference reference){
@@ -166,10 +173,9 @@ public class PostHolder extends RecyclerView.ViewHolder {
                 });
 
         panel.setOnClickListener(view -> {
-            Intent intent = new Intent(context, DetailActivity.class);
-            intent.putExtra(DetailFragment.KEY, reference.getKey());
+            if(fragmentInteractionListener == null) return;
 
-            context.startActivity(intent);
+            fragmentInteractionListener.onPostSelect(key);
         });
     }
 }

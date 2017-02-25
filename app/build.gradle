@@ -39,11 +39,11 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.jakewharton:butterknife:8.4.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.google.firebase:firebase-database:9.8.0'
     compile 'com.firebaseui:firebase-ui-database:1.0.0'
-    annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
     compile 'net.simonvt.schematic:schematic:0.7.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    annotationProcessor 'net.simonvt.schematic:schematic-compiler:0.7.0'
     debugCompile 'com.facebook.stetho:stetho:1.4.2'
 }
 

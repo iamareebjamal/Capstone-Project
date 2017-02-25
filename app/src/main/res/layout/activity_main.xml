@@ -24,20 +24,20 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/post_list"
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.example.iamareebjamal.feddup.ui.fragment.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp"
-        tools:listitem="@layout/item_card"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
+        android:fitsSystemWindows="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:layout="@layout/fragment_main" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        app:layout_anchor="@id/post_list"
+        app:layout_anchor="@id/main_fragment"
         app:layout_anchorGravity="bottom|right"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_pen"
