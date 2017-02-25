@@ -25,8 +25,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class DraftsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -38,6 +40,8 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
     private List<PostDraft> drafts = new ArrayList<>();
     private DraftsAdapter draftsAdapter = new DraftsAdapter(this, drafts);
+
+    private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +69,15 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
         drafts.clear();
         draftsAdapter.notifyDataSetChanged();
 
-        db.getDraftsFromCursor(cursor)
+        Subscription dbSubscription = db.getDraftsFromCursor(cursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(postService -> {
                     drafts.add(postService);
                     draftsAdapter.notifyDataSetChanged();
                 });
+
+        compositeSubscription.add(dbSubscription);
     }
 
     @OnClick(R.id.fab)
@@ -82,6 +88,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     protected void onDestroy() {
         if(cursor != null) cursor.close();
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
 
         super.onDestroy();
     }

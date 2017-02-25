@@ -29,8 +29,10 @@ import com.google.firebase.database.Query;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -43,11 +45,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private FavoritesHelper favoritesHelper = new FavoritesHelper(this);
     private DownvotesHelper downvotesHelper = new DownvotesHelper(this);
 
+    private CompositeSubscription compositeSubscription = new CompositeSubscription();
+
     @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.post_list) RecyclerView recyclerView;
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
+    private FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(favoriteCursor == null) return;
 
         PostHolder.clearFavorites();
-        favoritesHelper
+        Subscription favoritesSubscription = favoritesHelper
                 .getFavoritesFromCursor(favoriteCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -115,13 +119,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     PostHolder.addFavorite(key);
                     postAdapter.notifyDataSetChanged();
                 });
+
+        compositeSubscription.add(favoritesSubscription);
     }
 
     private void loadDownvotes() {
         if(downvotesCursor == null) return;
 
         PostHolder.clearDownVoted();
-        downvotesHelper
+        Subscription downvotesSubscription = downvotesHelper
                 .getDowvotesFromCursor(downvotesCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -130,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     postAdapter.notifyDataSetChanged();
                 });
 
+        compositeSubscription.add(downvotesSubscription);
     }
 
 
@@ -166,6 +173,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
+    protected void onDestroy() {
+        if(favoriteCursor != null) favoriteCursor.close();
+        if(downvotesCursor != null) downvotesCursor.close();
+
+        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+
+        super.onDestroy();
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(id == FAVORITE_LOADER)
             return new CursorLoader(this, DatabaseProvider.Favorites.CONTENT_URI, null, null, null, null);
@@ -198,5 +215,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(favoriteCursor != null) favoriteCursor.close();
+        if(downvotesCursor != null) downvotesCursor.close();
     }
 }
