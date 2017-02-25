@@ -153,17 +153,6 @@
         app:layout_anchorGravity="bottom|right|end"
         app:srcCompat="@drawable/ic_thumb_down" />
 
-    <FrameLayout
-        android:id="@+id/empty_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/grey"
-        app:elevation="10dp" >
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_pen"/>
-    </FrameLayout>
+    <include layout="@layout/empty_layout" />
 
 </android.support.design.widget.CoordinatorLayout>

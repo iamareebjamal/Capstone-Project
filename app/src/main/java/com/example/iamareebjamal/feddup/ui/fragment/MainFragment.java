@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
@@ -46,6 +47,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private DownvotesHelper downvotesHelper;
 
     @BindView(R.id.post_list) RecyclerView recyclerView;
+    @BindView(R.id.empty_layout) FrameLayout emptyLayout;
 
     private FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
 
@@ -82,7 +84,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return (xlarge || large);
     }
 
-    private boolean moveUp;
+    private boolean moveUp, started;
     public void setupList(){
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
 
@@ -98,6 +100,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         postAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(Post.class, R.layout.item_card, PostHolder.class, postReference) {
             @Override
             protected void populateViewHolder(PostHolder viewHolder, Post post, int position) {
+                if(!started) {
+                    started = true;
+                    if (mListener != null) mListener.onPostSelect(getRef(position).getKey());
+                    emptyLayout.setVisibility(View.GONE);
+                }
+
                 viewHolder.setPost(post, getRef(position));
             }
         };
@@ -221,5 +229,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public interface FragmentInteractionListener {
         void onFabDisplay(boolean show);
         void onPostSelect(String key);
+        void onPostStart(String key);
     }
 }

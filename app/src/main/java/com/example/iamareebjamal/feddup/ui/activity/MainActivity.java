@@ -105,4 +105,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
         startActivity(intent);
     }
+
+    @Override
+    public void onPostStart(String key) {
+        if (detailFragment != null) detailFragment.setKey(key);
+    }
 }
