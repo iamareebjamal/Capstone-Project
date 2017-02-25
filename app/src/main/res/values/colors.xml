@@ -7,4 +7,6 @@
     <color name="grey">#dddddd</color>
     <color name="status_bar_translucent">#44000000</color>
     <color name="white_transparent">#00ffffff</color>
+    <color name="white_translucent">#eeffffff</color>
+    <color name="dark_translucent">#bb333333</color>
 </resources>
