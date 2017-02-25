@@ -15,9 +15,7 @@
         <item name="android:textColorPrimary">#aa333333</item>
     </style>
 
-    <style name="AppTheme.Detail" parent="AppTheme.Post">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+    <style name="AppTheme.Detail" parent="AppTheme">
     </style>
 
     <style name="ActionBarThemeOverlay" parent="">

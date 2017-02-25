@@ -5,4 +5,6 @@
     <color name="colorAccent">#FFD54F</color>
     <color name="textDark">#dddddddd</color>
     <color name="grey">#dddddd</color>
+    <color name="status_bar_translucent">#44000000</color>
+    <color name="white_transparent">#00ffffff</color>
 </resources>

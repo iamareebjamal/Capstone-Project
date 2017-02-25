@@ -1,15 +1,17 @@
 package com.example.iamareebjamal.feddup.ui.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -47,7 +49,8 @@ public class DetailFragment extends Fragment {
 
     @BindView(R.id.main_content) CoordinatorLayout rootLayout;
     @BindView(R.id.detail_view) NestedScrollView detailView;
-    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
+    @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.backdrop) ImageView backdrop;
     @BindView(R.id.article_title) TextView title;
     @BindView(R.id.author) TextView author;
@@ -68,9 +71,13 @@ public class DetailFragment extends Fragment {
         View root =  inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, root);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(getContext(), R.color.white_transparent));
 
         return root;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 
     private String getDateTime(long timestamp) {
@@ -113,6 +120,7 @@ public class DetailFragment extends Fragment {
                 detailView.setVisibility(View.VISIBLE);
                 setBackdrop(post.url);
 
+                collapsingToolbarLayout.setTitle(post.title);
                 title.setText(post.title);
                 author.setText(post.user);
                 body.setText(post.content);
@@ -129,6 +137,13 @@ public class DetailFragment extends Fragment {
 
     }
 
+    public static int getDarkColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f;
+        return Color.HSVToColor(hsv);
+    }
+
     private void setBackdrop(String photoUrl) {
         Picasso.with(getContext())
                 .load(photoUrl)
@@ -142,11 +157,18 @@ public class DetailFragment extends Fragment {
                         Palette.from(bitmap).generate(palette -> {
                             Palette.Swatch swatch = palette.getVibrantSwatch();
                             if(swatch != null) {
+
+                                int mainColor = swatch.getRgb();
+                                int bodyText = swatch.getBodyTextColor();
+
+                                collapsingToolbarLayout.setContentScrimColor(mainColor);
+                                collapsingToolbarLayout.setStatusBarScrimColor(getDarkColor(mainColor));
+
                                 panel.setBackgroundColor(swatch.getRgb());
-                                DrawableCompat.setTint(DrawableCompat.wrap(title.getCompoundDrawables()[0]), swatch.getBodyTextColor());
-                                DrawableCompat.setTint(DrawableCompat.wrap(date.getCompoundDrawables()[0]), swatch.getBodyTextColor());
-                                DrawableCompat.setTint(DrawableCompat.wrap(author.getCompoundDrawables()[0]), swatch.getBodyTextColor());
-                                DrawableCompat.setTint(DrawableCompat.wrap(downvotes.getCompoundDrawables()[0]), swatch.getBodyTextColor());
+                                DrawableCompat.setTint(DrawableCompat.wrap(title.getCompoundDrawables()[0]), bodyText);
+                                DrawableCompat.setTint(DrawableCompat.wrap(date.getCompoundDrawables()[0]), bodyText);
+                                DrawableCompat.setTint(DrawableCompat.wrap(author.getCompoundDrawables()[0]), bodyText);
+                                DrawableCompat.setTint(DrawableCompat.wrap(downvotes.getCompoundDrawables()[0]), bodyText);
 
                                 title.setTextColor(swatch.getTitleTextColor());
                                 date.setTextColor(swatch.getTitleTextColor());
