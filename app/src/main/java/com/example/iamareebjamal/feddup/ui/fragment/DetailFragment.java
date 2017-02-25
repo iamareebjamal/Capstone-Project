@@ -57,7 +57,6 @@ public class DetailFragment extends Fragment {
     private String key;
 
     @BindView(R.id.main_content) CoordinatorLayout rootLayout;
-    @BindView(R.id.detail_view) NestedScrollView detailView;
     @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.backdrop) ImageView backdrop;
@@ -142,14 +141,13 @@ public class DetailFragment extends Fragment {
                 if (post == null) {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(rootLayout, "Post Deleted", Snackbar.LENGTH_INDEFINITE).show();
-                    detailView.setVisibility(View.GONE);
+                    emptyLayout.setVisibility(View.VISIBLE);
 
                     backdrop.setImageDrawable(VectorDrawableCompat.create(getContext().getResources(), R.drawable.ic_photo, null));
                     return;
                 }
 
                 downvote.show();
-                detailView.setVisibility(View.VISIBLE);
                 setBackdrop(post.url);
 
                 collapsingToolbarLayout.setTitle(post.title);
