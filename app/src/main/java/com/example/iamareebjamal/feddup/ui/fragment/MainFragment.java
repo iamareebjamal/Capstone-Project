@@ -76,6 +76,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().getSupportLoaderManager().initLoader(DOWNVOTES_CURSOR, null, this);
     }
 
+    public boolean isTablet() {
+        boolean xlarge = ((getContext().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((getContext().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
+    }
+
     private boolean moveUp;
     public void setupList(){
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
@@ -83,8 +89,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-            gridLayoutManager.setSpanCount(2);
+        //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
+        //    gridLayoutManager.setSpanCount(2);
 
         Query postReference = FirebaseDatabase.getInstance().getReference("posts").orderByChild("downvotes").limitToFirst(10);
 

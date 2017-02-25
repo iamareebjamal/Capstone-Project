@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
     @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
 
+    DetailFragment detailFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +35,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+
+        detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
+    }
+
+    public boolean isDualPane() {
+        return detailFragment!=null && detailFragment.isInLayout();
     }
 
     private void loadDrafts() {
@@ -87,6 +95,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
 
     @Override
     public void onPostSelect(String key) {
+        if(isDualPane()) {
+            detailFragment.setKey(key);
+            return;
+        }
+
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailFragment.KEY, key);
 

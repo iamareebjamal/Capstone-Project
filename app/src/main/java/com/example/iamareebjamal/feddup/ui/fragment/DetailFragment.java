@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -59,6 +61,8 @@ public class DetailFragment extends Fragment {
     @BindView(R.id.downvotes) TextView downvotes;
     @BindView(R.id.meta_bar) LinearLayout panel;
     @BindView(R.id.progress) ProgressBar progressBar;
+    @BindView(R.id.downvote) FloatingActionButton downvote;
+    @BindView(R.id.empty_layout) FrameLayout emptyLayout;
 
     private Query query;
     private ValueEventListener valueEventListener;
@@ -73,6 +77,7 @@ public class DetailFragment extends Fragment {
 
         collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(getContext(), R.color.white_transparent));
 
+        downvote.hide();
         return root;
     }
 
@@ -90,6 +95,7 @@ public class DetailFragment extends Fragment {
 
     public void setKey(String key) {
         this.key = key;
+        emptyLayout.setVisibility(View.GONE);
         loadArticle();
     }
 
@@ -98,6 +104,8 @@ public class DetailFragment extends Fragment {
             Snackbar.make(rootLayout, "No Article key provided", Snackbar.LENGTH_LONG).show();
             return;
         }
+
+        if (query != null) query.removeEventListener(valueEventListener);
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -117,6 +125,7 @@ public class DetailFragment extends Fragment {
                     return;
                 }
 
+                downvote.show();
                 detailView.setVisibility(View.VISIBLE);
                 setBackdrop(post.url);
 
@@ -144,6 +153,28 @@ public class DetailFragment extends Fragment {
         return Color.HSVToColor(hsv);
     }
 
+    private void setColors(Palette.Swatch swatch) {
+        if(swatch == null)
+            return;
+
+        int mainColor = swatch.getRgb();
+        int bodyText = swatch.getBodyTextColor();
+
+        collapsingToolbarLayout.setContentScrimColor(mainColor);
+        collapsingToolbarLayout.setStatusBarScrimColor(getDarkColor(mainColor));
+
+        panel.setBackgroundColor(swatch.getRgb());
+        DrawableCompat.setTint(DrawableCompat.wrap(title.getCompoundDrawables()[0]), bodyText);
+        DrawableCompat.setTint(DrawableCompat.wrap(date.getCompoundDrawables()[0]), bodyText);
+        DrawableCompat.setTint(DrawableCompat.wrap(author.getCompoundDrawables()[0]), bodyText);
+        DrawableCompat.setTint(DrawableCompat.wrap(downvotes.getCompoundDrawables()[0]), bodyText);
+
+        title.setTextColor(swatch.getTitleTextColor());
+        date.setTextColor(swatch.getTitleTextColor());
+        author.setTextColor(swatch.getTitleTextColor());
+        downvotes.setTextColor(swatch.getTitleTextColor());
+    }
+
     private void setBackdrop(String photoUrl) {
         Picasso.with(getContext())
                 .load(photoUrl)
@@ -156,25 +187,7 @@ public class DetailFragment extends Fragment {
                         Bitmap bitmap = ((BitmapDrawable) backdrop.getDrawable()).getBitmap();
                         Palette.from(bitmap).generate(palette -> {
                             Palette.Swatch swatch = palette.getVibrantSwatch();
-                            if(swatch != null) {
-
-                                int mainColor = swatch.getRgb();
-                                int bodyText = swatch.getBodyTextColor();
-
-                                collapsingToolbarLayout.setContentScrimColor(mainColor);
-                                collapsingToolbarLayout.setStatusBarScrimColor(getDarkColor(mainColor));
-
-                                panel.setBackgroundColor(swatch.getRgb());
-                                DrawableCompat.setTint(DrawableCompat.wrap(title.getCompoundDrawables()[0]), bodyText);
-                                DrawableCompat.setTint(DrawableCompat.wrap(date.getCompoundDrawables()[0]), bodyText);
-                                DrawableCompat.setTint(DrawableCompat.wrap(author.getCompoundDrawables()[0]), bodyText);
-                                DrawableCompat.setTint(DrawableCompat.wrap(downvotes.getCompoundDrawables()[0]), bodyText);
-
-                                title.setTextColor(swatch.getTitleTextColor());
-                                date.setTextColor(swatch.getTitleTextColor());
-                                author.setTextColor(swatch.getTitleTextColor());
-                                downvotes.setTextColor(swatch.getTitleTextColor());
-                            }
+                            setColors(swatch);
                         });
                     }
                 });
