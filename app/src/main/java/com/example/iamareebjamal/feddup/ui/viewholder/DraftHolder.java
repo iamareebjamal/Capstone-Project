@@ -85,7 +85,7 @@ public class DraftHolder extends RecyclerView.ViewHolder {
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(rows -> {
-                        Toast.makeText(context, "Draft Deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, context.getString(R.string.draft_deleted), Toast.LENGTH_SHORT).show();
                     }, throwable -> Log.d("Error", "Can't delete"))
         );
 

@@ -1,5 +1,6 @@
 package com.example.iamareebjamal.feddup.ui.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -62,6 +63,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class PostActivity extends AppCompatActivity {
 
+    private static final String STORAGE_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE;
     private static final String TAG = "PostActivity";
     private static final String IMAGE_TAG = "image";
     private static final int PICK_IMAGE = 34;
@@ -146,12 +148,15 @@ public class PostActivity extends AppCompatActivity {
         created.onNext(true);
     }
 
-    private Observable<Boolean> formValidObservable(TextView textView, TextInputLayout textInputLayout, int lower_bound, int upper_bound) {
-        String message = String.format(Locale.getDefault(), "Should be between %d and %d", lower_bound, upper_bound);
+    private Observable<Boolean> formValidObservable(TextView textView, TextInputLayout textInputLayout,
+                                                    int lower_bound, int upper_bound) {
+        String message = String.format(Locale.getDefault(),
+                getString(R.string.length_validator), lower_bound, upper_bound);
 
         Observable<Boolean> formObservable =
                 RxTextView.textChanges(textView)
-                        .map(inputText -> inputText.length() > lower_bound && inputText.length() < upper_bound)
+                        .map(inputText ->
+                                inputText.length() > lower_bound && inputText.length() < upper_bound)
                         .distinctUntilChanged()
                         .debounce(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread());
@@ -183,7 +188,8 @@ public class PostActivity extends AppCompatActivity {
                 userObservable,
                 contentObservable,
                 created,
-                (titleValid, userValid, contentValid, photoCreated) -> titleValid && userValid && contentValid && photoCreated)
+                (titleValid, userValid, contentValid, photoCreated) ->
+                        titleValid && userValid && contentValid && photoCreated)
                 .subscribe(valid -> {
                     if(valid) {
                         postArticle.show();
@@ -216,17 +222,21 @@ public class PostActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
 
                     if(postConfirmation.getError()) {
-                        Snackbar.make(rootLayout, postConfirmation.getMessage(), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(rootLayout, postConfirmation.getMessage(),
+                                Snackbar.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, "Post Created", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.post_created), Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }, throwable -> {
                     progressBar.setVisibility(View.GONE);
                     if(throwable instanceof HttpException) {
-                        PostConfirmation postConfirmation = ErrorUtils.parseError(((HttpException) throwable).response());
+                        PostConfirmation postConfirmation = ErrorUtils.parseError(
+                                ((HttpException) throwable).response()
+                        );
 
-                        Snackbar.make(rootLayout, postConfirmation.getMessage(), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(rootLayout, postConfirmation.getMessage(),
+                                Snackbar.LENGTH_LONG).show();
                     }
                 });
 
@@ -241,15 +251,15 @@ public class PostActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         if(condition) {
 
-            Snackbar.make(rootLayout, "Post Saved", Snackbar.LENGTH_LONG)
-                    .setAction("Undo", view -> deleteDraft())
+            Snackbar.make(rootLayout, getString(R.string.post_saved), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.undo), view -> deleteDraft())
                     .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
                     .show();
 
             Log.d(TAG, "Post Created : " + draftUri.toString());
         } else {
-            Snackbar.make(rootLayout, "Saving Post Failed", Snackbar.LENGTH_LONG)
-                    .setAction("Retry", view -> saveInDraft())
+            Snackbar.make(rootLayout, getString(R.string.post_save_failed), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.retry), view -> saveInDraft())
                     .show();
 
             draftUri = null;
@@ -272,8 +282,8 @@ public class PostActivity extends AppCompatActivity {
 
     private void updatePost() {
         if(draftUri == null) {
-            Snackbar.make(rootLayout, "Error updating Draft. Create new?", Snackbar.LENGTH_LONG)
-                    .setAction("Yes", view -> savePost())
+            Snackbar.make(rootLayout, getString(R.string.error_updating_draft), Snackbar.LENGTH_LONG)
+                    .setAction(getString(android.R.string.yes), view -> savePost())
                     .show();
 
             return;
@@ -292,8 +302,8 @@ public class PostActivity extends AppCompatActivity {
 
     private void deleteDraft() {
         if(draftUri == null) {
-            Snackbar.make(rootLayout, "No Draft to Delete. Create new?", Snackbar.LENGTH_LONG)
-                    .setAction("Yes", view -> saveInDraft())
+            Snackbar.make(rootLayout, getString(R.string.no_draft_to_delete), Snackbar.LENGTH_LONG)
+                    .setAction(getString(android.R.string.yes), view -> saveInDraft())
                     .show();
 
             return;
@@ -308,15 +318,15 @@ public class PostActivity extends AppCompatActivity {
                     if (rows != 0) {
                         draftUri = null;
 
-                        Snackbar.make(rootLayout, "Draft Deleted", Snackbar.LENGTH_LONG)
-                                .setAction("Undo", view -> saveInDraft())
+                        Snackbar.make(rootLayout, getString(R.string.draft_deleted), Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.undo), view -> saveInDraft())
                                 .setActionTextColor(ContextCompat.getColor(this, R.color.colorPrimary))
                                 .show();
 
                         Log.d(TAG, "Post Deleted : " + draftUri.toString() + " Rows : " + rows);
                     } else {
-                        Snackbar.make(rootLayout, "Deleting Post Failed", Snackbar.LENGTH_LONG)
-                                .setAction("Retry", view -> deleteDraft())
+                        Snackbar.make(rootLayout, getString(R.string.post_delete_failed), Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.retry), view -> deleteDraft())
                                 .show();
 
                         Log.d(TAG, "Post Delete Failed");
@@ -330,10 +340,11 @@ public class PostActivity extends AppCompatActivity {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
 
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent pickIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
 
-        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        Intent chooserIntent = Intent.createChooser(getIntent, getString(R.string.select_image));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
@@ -344,7 +355,7 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                Snackbar.make(rootLayout, "Failed to load image", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(rootLayout, getString(R.string.select_image_failed), Snackbar.LENGTH_LONG).show();
                 return;
             }
 
@@ -357,8 +368,11 @@ public class PostActivity extends AppCompatActivity {
 
     @OnClick(R.id.image)
     public void requestPermissionAndLoadImage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, PICK_IMAGE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                ContextCompat.checkSelfPermission(this, STORAGE_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{STORAGE_PERMISSION}, PICK_IMAGE);
             return;
         }
 
@@ -366,11 +380,13 @@ public class PostActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
+                                           @NonNull final int[] grantResults) {
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PICK_IMAGE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            loadImage();
-        }
+        if (requestCode == PICK_IMAGE && grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) loadImage();
+
     }
 
     private boolean save = true;
@@ -381,9 +397,9 @@ public class PostActivity extends AppCompatActivity {
 
         final Context context = this;
 
-        Snackbar.make(rootLayout, "Saving in Drafts. Undo?", Snackbar.LENGTH_SHORT)
-                .setAction("Yes", view -> {
-                    Toast.makeText(this, "Draft Deleted", Toast.LENGTH_LONG).show();
+        Snackbar.make(rootLayout, getString(R.string.saving_in_drafts_undo), Snackbar.LENGTH_SHORT)
+                .setAction(android.R.string.yes, view -> {
+                    Toast.makeText(this, getString(R.string.draft_deleted), Toast.LENGTH_LONG).show();
                     save = false;
                     super.onBackPressed();
                 })
@@ -392,7 +408,7 @@ public class PostActivity extends AppCompatActivity {
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         super.onDismissed(transientBottomBar, event);
                         if(save) {
-                            Toast.makeText(context, "Saving in Drafts", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getString(R.string.saving_in_drafts), Toast.LENGTH_SHORT).show();
                             saveInDraft();
                         }
                         close.run();

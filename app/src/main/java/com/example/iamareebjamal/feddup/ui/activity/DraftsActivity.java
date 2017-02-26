@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,7 +35,6 @@ import butterknife.OnClick;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class DraftsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -47,10 +45,11 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.fab) FloatingActionButton fab;
 
     private DraftsHelper db = new DraftsHelper(this);
-    private Cursor cursor;
 
     private List<PostDraft> drafts = new ArrayList<>();
-    private DraftsAdapter draftsAdapter = new DraftsAdapter(this, drafts);
+    private DraftsAdapter draftsAdapter = new DraftsAdapter(drafts);
+
+    private Subscription subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,11 +103,15 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
-    private void loadData() {
+    private void loadData(Cursor cursor) {
         drafts.clear();
         draftsAdapter.notifyDataSetChanged();
 
-        db.getDraftsFromCursor(cursor)
+        if(cursor == null) return;
+
+        if(subscription != null) subscription.unsubscribe();
+
+        subscription = db.getDraftsFromCursor(cursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(postService -> {
@@ -137,25 +140,30 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, DatabaseProvider.Drafts.CONTENT_URI, null, null, null, DraftColumns._ID + " DESC");
+        return new CursorLoader(this,
+                DatabaseProvider.Drafts.CONTENT_URI,
+                null,
+                null,
+                null,
+                DraftColumns._ID + " DESC");
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(cursor != null) cursor.close();
-
-        cursor = data;
-        loadData();
+        loadData(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if(cursor != null) cursor.close();
+        // No need to close cursor. LoadeManager handles it itself
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if(subscription != null) subscription.unsubscribe();
+
         RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
         refWatcher.watch(this);
     }

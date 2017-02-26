@@ -18,7 +18,8 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
+        DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.detail_fragment);
 
         setSupportActionBar(detailFragment.getToolbar());
         ActionBar ab = getSupportActionBar();

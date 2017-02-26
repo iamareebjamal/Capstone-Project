@@ -10,12 +10,15 @@ import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.InexactContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
-@ContentProvider(authority = DatabaseProvider.AUTHORITY, database = Database.class, packageName="com.example.iamareebjamal.feddup.data.db.provider")
+@ContentProvider(authority = DatabaseProvider.AUTHORITY,
+        database = Database.class,
+        packageName="com.example.iamareebjamal.feddup.data.db.provider"
+)
 public class DatabaseProvider {
 
-    public static final String AUTHORITY =  "iamareebjamal.feddup.DatabaseProvider";
+    static final String AUTHORITY =  "iamareebjamal.feddup.DatabaseProvider";
 
-    static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     private static Uri buildUri(String... paths) {
         Uri.Builder builder = BASE_CONTENT_URI.buildUpon();

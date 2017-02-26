@@ -13,7 +13,6 @@ import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -142,7 +141,7 @@ public class DetailFragment extends Fragment {
 
                 if (post == null) {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(rootLayout, "Post Deleted", Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(rootLayout, getString(R.string.post_deleted), Snackbar.LENGTH_INDEFINITE).show();
                     emptyLayout.setVisibility(View.VISIBLE);
 
                     backdrop.setImageDrawable(VectorDrawableCompat.create(getContext().getResources(), R.drawable.ic_photo, null));

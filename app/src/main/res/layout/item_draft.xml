@@ -21,7 +21,8 @@
             android:id="@+id/image"
             android:background="@color/grey"
             android:layout_width="match_parent"
-            android:layout_height="200dp" />
+            android:layout_height="200dp"
+            android:contentDescription="@null"/>
 
         <LinearLayout
             android:id="@+id/title_bar"
@@ -45,7 +46,8 @@
                 android:id="@+id/delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_delete"/>
+                app:srcCompat="@drawable/ic_delete"
+                android:contentDescription="@null" />
 
         </LinearLayout>
 

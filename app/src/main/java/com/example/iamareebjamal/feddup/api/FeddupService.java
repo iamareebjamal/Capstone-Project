@@ -13,5 +13,10 @@ public interface FeddupService {
 
     @Multipart
     @POST("/new_post")
-    Observable<PostConfirmation> post(@Part MultipartBody.Part image, @Part("title") RequestBody title, @Part("user") RequestBody user, @Part("content") RequestBody content);
+    Observable<PostConfirmation> post(
+            @Part MultipartBody.Part image,
+            @Part("title") RequestBody title,
+            @Part("user") RequestBody user,
+            @Part("content") RequestBody content
+    );
 }

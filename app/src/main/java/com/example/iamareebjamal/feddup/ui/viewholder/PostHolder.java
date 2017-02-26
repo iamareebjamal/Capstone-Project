@@ -24,6 +24,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -59,20 +60,12 @@ public class PostHolder extends RecyclerView.ViewHolder {
         downvotesHelper = new DownvotesHelper(context);
     }
 
-    public static void setDownvoted(Set<String> downvoted) {
-        PostHolder.downvoted = downvoted;
-    }
-
     public static void addDownVoted(String key) {
         downvoted.add(key);
     }
 
     public static void clearDownVoted() {
         downvoted.clear();
-    }
-
-    public static void setFavorites(Set<String> favorites) {
-        PostHolder.favorites = favorites;
     }
 
     public static void addFavorite(String key) {
@@ -92,7 +85,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         String key = reference.getKey();
 
         title.setText(post.title);
-        downvotes.setText("-"+post.downvotes);
+        downvotes.setText(String.format(Locale.getDefault(), context.getString(R.string.downvotes_format), post.downvotes));
 
         if(favorites.contains(key)){
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));

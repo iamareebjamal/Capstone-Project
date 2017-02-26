@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
@@ -78,23 +77,6 @@ public class DraftsHelper {
             subscriber.onNext(uri);
             subscriber.onCompleted();
         });
-    }
-
-    /* Extremely hacky method for development mode only */
-    public Observable<Uri> insertDraft(String... args) {
-
-        PostDraft postDraft = new PostDraft();
-
-        try {
-            postDraft.setTitle(args[0]);
-            postDraft.setAuthor(args[1]);
-            postDraft.setContent(args[2]);
-            postDraft.setFilePath(args[3]);
-        } catch (IndexOutOfBoundsException ioe) {
-            Log.d("DB", "Completed on Exception");
-        }
-
-        return insertDraft(postDraft);
     }
 
     public Observable<Integer> updateDraft(Uri draftUri, PostDraft postDraft) {
