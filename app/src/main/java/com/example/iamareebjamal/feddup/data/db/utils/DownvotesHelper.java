@@ -1,7 +1,7 @@
 package com.example.iamareebjamal.feddup.data.db.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -12,13 +12,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import rx.Observable;
 
 public class DownvotesHelper {
-    private Context context;
 
-    public DownvotesHelper(Context context) {
-        this.context = context;
+    private static ContentResolver contentResolver;
+
+    static void initialize(ContentResolver contentResolver) {
+        DownvotesHelper.contentResolver = contentResolver;
     }
 
-    public Observable<String> getDowvotesFromCursor(Cursor cursor) {
+    private static void verify() {
+        if(contentResolver == null)
+            throw new IllegalAccessError("DownvotesHelper : Must call initialize with ContentResolver first");
+    }
+
+    public static Observable<String> getDowvotesFromCursor(Cursor cursor) {
         return Observable.create(subscriber -> {
             if (cursor != null) {
                 cursor.moveToFirst();
@@ -32,9 +38,11 @@ public class DownvotesHelper {
         });
     }
 
-    public Observable<String> getDownvotes() {
+    public static Observable<String> getDownvotes() {
+        verify();
+
         return Observable.defer(() -> {
-            Cursor cursor = context.getContentResolver().query(
+            Cursor cursor = contentResolver.query(
                     DatabaseProvider.Downvotes.CONTENT_URI,
                     null,
                     null,
@@ -49,10 +57,11 @@ public class DownvotesHelper {
         });
     }
 
-    public Observable<Boolean> isDownvoted(String key) {
+    public static Observable<Boolean> isDownvoted(String key) {
+        verify();
 
         return Observable.create(subscriber -> {
-            Cursor cursor = context.getContentResolver().query(
+            Cursor cursor = contentResolver.query(
                     DatabaseProvider.Downvotes.CONTENT_URI,
                     null,
                     PostColumns.POST_KEY + "=?",
@@ -67,13 +76,14 @@ public class DownvotesHelper {
         });
     }
 
-    public Observable<Boolean> addDownvote(String key, int currentValue) {
+    public static Observable<Boolean> addDownvote(String key, int currentValue) {
+        verify();
 
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
             values.put(PostColumns.POST_KEY, key);
 
-            Uri uri = context.getContentResolver().insert(DatabaseProvider.Downvotes.CONTENT_URI,
+            Uri uri = contentResolver.insert(DatabaseProvider.Downvotes.CONTENT_URI,
                     values);
 
             if(uri != null)
@@ -87,11 +97,12 @@ public class DownvotesHelper {
         }).map(uri -> uri != null);
     }
 
-    public Observable<Integer> removeDownvote(String key, int currentValue) {
+    public static Observable<Integer> removeDownvote(String key, int currentValue) {
+        verify();
 
         return Observable.create(subscriber -> {
 
-            int rows = context.getContentResolver().delete(DatabaseProvider.Downvotes.CONTENT_URI,
+            int rows = contentResolver.delete(DatabaseProvider.Downvotes.CONTENT_URI,
                     PostColumns.POST_KEY + "=?", new String[]{key});
 
             if (rows > 0)

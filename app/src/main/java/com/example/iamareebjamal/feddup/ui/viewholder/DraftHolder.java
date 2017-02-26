@@ -81,7 +81,7 @@ public class DraftHolder extends RecyclerView.ViewHolder {
         }
 
         delete.setOnClickListener(view ->
-            new DraftsHelper(context).deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
+            DraftsHelper.deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(rows -> {

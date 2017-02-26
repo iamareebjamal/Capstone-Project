@@ -44,8 +44,6 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     @BindView(R.id.draft_list) RecyclerView recyclerView;
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    private DraftsHelper db = new DraftsHelper(this);
-
     private List<PostDraft> drafts = new ArrayList<>();
     private DraftsAdapter draftsAdapter = new DraftsAdapter(drafts);
 
@@ -111,7 +109,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
         if(subscription != null) subscription.unsubscribe();
 
-        subscription = db.getDraftsFromCursor(cursor)
+        subscription = DraftsHelper.getDraftsFromCursor(cursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(postService -> {
@@ -155,7 +153,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        // No need to close cursor. LoadeManager handles it itself
+        // No need to close cursor. LoaderManager handles it itself
     }
 
     @Override

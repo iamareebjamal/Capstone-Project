@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -74,7 +73,6 @@ public class DetailFragment extends Fragment {
     private Query query;
     private Post post;
     private ValueEventListener valueEventListener;
-    private DownvotesHelper downvotesHelper;
 
     private CompositeSubscription compositeSubscription;
 
@@ -90,13 +88,6 @@ public class DetailFragment extends Fragment {
 
         downvote.hide();
         return root;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        downvotesHelper = new DownvotesHelper(getContext());
     }
 
     public Toolbar getToolbar() {
@@ -176,7 +167,7 @@ public class DetailFragment extends Fragment {
     private View.OnClickListener addDownvote = view -> {
         if(post == null) return;
 
-        Subscription subscription = downvotesHelper.addDownvote(key, post.downvotes)
+        Subscription subscription = DownvotesHelper.addDownvote(key, post.downvotes)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uri -> Log.d(TAG, "Added " + uri), throwableHandler);
@@ -187,7 +178,7 @@ public class DetailFragment extends Fragment {
     private View.OnClickListener removeDownvote = view -> {
         if(post == null) return;
 
-        Subscription subscription = downvotesHelper.removeDownvote(key, post.downvotes)
+        Subscription subscription = DownvotesHelper.removeDownvote(key, post.downvotes)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(rows -> Log.d(TAG, "Removed " + rows), throwableHandler);
@@ -196,7 +187,7 @@ public class DetailFragment extends Fragment {
     };
 
     private void loadArticleStatus(String key) {
-        Subscription dbSubscription = downvotesHelper.isDownvoted(key)
+        Subscription dbSubscription = DownvotesHelper.isDownvoted(key)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(downvoted -> {

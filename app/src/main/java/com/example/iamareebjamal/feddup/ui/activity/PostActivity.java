@@ -70,8 +70,6 @@ public class PostActivity extends AppCompatActivity {
     private String filePath;
     private Uri draftUri;
 
-    private DraftsHelper db = new DraftsHelper(this);
-
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.postImage) ImageView postImage;
@@ -271,7 +269,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void savePost() {
-        Subscription postSubscription = db.insertDraft(preparePost())
+        Subscription postSubscription = DraftsHelper.insertDraft(preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
@@ -292,7 +290,7 @@ public class PostActivity extends AppCompatActivity {
             return;
         }
 
-        Subscription postSubscription = db.updateDraft(draftUri, preparePost())
+        Subscription postSubscription = DraftsHelper.updateDraft(draftUri, preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
@@ -312,7 +310,7 @@ public class PostActivity extends AppCompatActivity {
             return;
         }
 
-        Subscription postSubscription = db.deleteUri(draftUri)
+        Subscription postSubscription = DraftsHelper.deleteUri(draftUri)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )

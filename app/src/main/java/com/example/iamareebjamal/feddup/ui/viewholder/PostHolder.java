@@ -44,8 +44,6 @@ public class PostHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.title_bar) LinearLayout titleBar;
 
     private Context context;
-    private FavoritesHelper favoritesHelper;
-    private DownvotesHelper downvotesHelper;
 
     private static Set<String> downvoted= new HashSet<>();
     private static Set<String> favorites = new HashSet<>();
@@ -56,8 +54,6 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
         ButterKnife.bind(this, itemView);
         context = itemView.getContext();
-        favoritesHelper = new FavoritesHelper(context);
-        downvotesHelper = new DownvotesHelper(context);
     }
 
     public static void addDownVoted(String key) {
@@ -90,7 +86,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         if(favorites.contains(key)){
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));
             favorite.setOnClickListener(view ->
-                    favoritesHelper.removeFavorite(reference.getKey())
+                    FavoritesHelper.removeFavorite(reference.getKey())
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(rows ->
@@ -101,7 +97,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         } else {
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart_outline, null));
             favorite.setOnClickListener(view ->
-                    favoritesHelper.addFavorite(reference.getKey())
+                    FavoritesHelper.addFavorite(reference.getKey())
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(added ->
@@ -114,7 +110,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         if(downvoted.contains(key)){
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down, null));
             downvote.setOnClickListener(view ->
-                downvotesHelper.removeDownvote(reference.getKey(), post.downvotes)
+                DownvotesHelper.removeDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(rows ->
@@ -127,7 +123,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         } else {
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down_outline, null));
             downvote.setOnClickListener(view ->
-                downvotesHelper.addDownvote(reference.getKey(), post.downvotes)
+                DownvotesHelper.addDownvote(reference.getKey(), post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(added ->

@@ -48,9 +48,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private Cursor favoriteCursor;
     private Cursor downvotesCursor;
 
-    private FavoritesHelper favoritesHelper;
-    private DownvotesHelper downvotesHelper;
-
     private CompositeSubscription compositeSubscription;
 
     @BindView(R.id.post_list) RecyclerView recyclerView;
@@ -77,9 +74,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        favoritesHelper = new FavoritesHelper(getContext());
-        downvotesHelper = new DownvotesHelper(getContext());
 
         compositeSubscription = new CompositeSubscription();
 
@@ -146,7 +140,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if(favoriteCursor == null) return;
 
         PostHolder.clearFavorites();
-        Subscription subscription = favoritesHelper
+        Subscription subscription = FavoritesHelper
                 .getFavoritesFromCursor(favoriteCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -162,7 +156,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if(downvotesCursor == null) return;
 
         PostHolder.clearDownVoted();
-        Subscription subscription = downvotesHelper
+        Subscription subscription = DownvotesHelper
                 .getDowvotesFromCursor(downvotesCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())

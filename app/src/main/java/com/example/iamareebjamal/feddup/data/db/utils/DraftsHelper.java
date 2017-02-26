@@ -1,7 +1,7 @@
 package com.example.iamareebjamal.feddup.data.db.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -13,14 +13,18 @@ import rx.Observable;
 
 public class DraftsHelper {
 
-    private Context context;
+    private static ContentResolver contentResolver;
 
-    public DraftsHelper(Context context) {
-        this.context = context;
+    static void initialize(ContentResolver contentResolver) {
+        DraftsHelper.contentResolver = contentResolver;
     }
 
+    private static void verify() {
+        if(contentResolver == null)
+            throw new IllegalAccessError("DraftsHelper : Must call initialize with ContentResolver first");
+    }
 
-    public Observable<PostDraft> getDraftsFromCursor(Cursor cursor) {
+    public static Observable<PostDraft> getDraftsFromCursor(Cursor cursor) {
         return Observable.create(subscriber -> {
             if (cursor != null) {
                 cursor.moveToFirst();
@@ -50,9 +54,11 @@ public class DraftsHelper {
         });
     }
 
-    public Observable<PostDraft> getDrafts() {
+    public static Observable<PostDraft> getDrafts() {
+        verify();
+
         return Observable.defer(() -> {
-            Cursor cursor = context.getContentResolver().query(
+            Cursor cursor = contentResolver.query(
                     DatabaseProvider.Drafts.CONTENT_URI,
                     null,
                     null,
@@ -63,7 +69,8 @@ public class DraftsHelper {
         });
     }
 
-    public Observable<Uri> insertDraft(PostDraft postDraft) {
+    public static Observable<Uri> insertDraft(PostDraft postDraft) {
+        verify();
 
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
@@ -72,14 +79,16 @@ public class DraftsHelper {
             values.put(DraftColumns.content, postDraft.getContent());
             values.put(DraftColumns.filePath, postDraft.getFilePath());
 
-            Uri uri = context.getContentResolver().insert(DatabaseProvider.Drafts.CONTENT_URI, values);
+            Uri uri = contentResolver.insert(DatabaseProvider.Drafts.CONTENT_URI, values);
 
             subscriber.onNext(uri);
             subscriber.onCompleted();
         });
     }
 
-    public Observable<Integer> updateDraft(Uri draftUri, PostDraft postDraft) {
+    public static Observable<Integer> updateDraft(Uri draftUri, PostDraft postDraft) {
+        verify();
+
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
             values.put(DraftColumns.title, postDraft.getTitle());
@@ -87,17 +96,19 @@ public class DraftsHelper {
             values.put(DraftColumns.content, postDraft.getContent());
             values.put(DraftColumns.filePath, postDraft.getFilePath());
 
-            int rows = context.getContentResolver().update(draftUri, values, null, null);
+            int rows = contentResolver.update(draftUri, values, null, null);
 
             subscriber.onNext(rows);
             subscriber.onCompleted();
         });
     }
 
-    public Observable<Integer> deleteUri(Uri uri) {
+    public static Observable<Integer> deleteUri(Uri uri) {
+        verify();
+
         return Observable.create(subscriber -> {
 
-            int rows = context.getContentResolver().delete(uri, null, null);
+            int rows = contentResolver.delete(uri, null, null);
 
             subscriber.onNext(rows);
             subscriber.onCompleted();

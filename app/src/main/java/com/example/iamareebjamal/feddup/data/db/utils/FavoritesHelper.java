@@ -1,7 +1,7 @@
 package com.example.iamareebjamal.feddup.data.db.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -12,13 +12,18 @@ import rx.Observable;
 
 public class FavoritesHelper {
 
-    private Context context;
+    private static ContentResolver contentResolver;
 
-    public FavoritesHelper(Context context) {
-        this.context = context;
+    static void initialize(ContentResolver contentResolver) {
+        FavoritesHelper.contentResolver = contentResolver;
     }
 
-    public Observable<String> getFavoritesFromCursor(Cursor cursor) {
+    private static void verify() {
+        if(contentResolver == null)
+            throw new IllegalAccessError("FavoriesHelper : Must call initialize with ContentResolver first");
+    }
+
+    public static Observable<String> getFavoritesFromCursor(Cursor cursor) {
         return Observable.create(subscriber -> {
             if (cursor != null) {
                 cursor.moveToFirst();
@@ -32,9 +37,11 @@ public class FavoritesHelper {
         });
     }
 
-    public Observable<String> getFavorites() {
+    public static Observable<String> getFavorites() {
+        verify();
+
         return Observable.defer(() -> {
-            Cursor cursor = context.getContentResolver().query(
+            Cursor cursor = contentResolver.query(
                     DatabaseProvider.Favorites.CONTENT_URI,
                     null,
                     null,
@@ -49,13 +56,14 @@ public class FavoritesHelper {
         });
     }
 
-    public Observable<Boolean> addFavorite(String key) {
+    public static Observable<Boolean> addFavorite(String key) {
+        verify();
 
         return Observable.create(subscriber -> {
             ContentValues values = new ContentValues();
             values.put(PostColumns.POST_KEY, key);
 
-            Uri uri = context.getContentResolver().insert(DatabaseProvider.Favorites.CONTENT_URI,
+            Uri uri = contentResolver.insert(DatabaseProvider.Favorites.CONTENT_URI,
                     values);
 
             subscriber.onNext(uri);
@@ -63,11 +71,13 @@ public class FavoritesHelper {
         }).map(uri -> uri != null);
     }
 
-    public Observable<Integer> removeFavorite(String key) {
+    public static Observable<Integer> removeFavorite(String key) {
+        verify();
+
 
         return Observable.create(subscriber -> {
 
-            int rows = context.getContentResolver().delete(DatabaseProvider.Favorites.CONTENT_URI,
+            int rows = contentResolver.delete(DatabaseProvider.Favorites.CONTENT_URI,
                     PostColumns.POST_KEY + "=?", new String[]{key});
 
             subscriber.onNext(rows);

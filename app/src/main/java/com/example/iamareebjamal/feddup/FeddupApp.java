@@ -3,6 +3,8 @@ package com.example.iamareebjamal.feddup;
 import android.app.Application;
 import android.content.Context;
 
+import com.example.iamareebjamal.feddup.data.db.utils.DatabaseHelper;
+import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,6 +29,8 @@ public class FeddupApp extends Application {
             return;
         }
         refWatcher = LeakCanary.install(this);
+
+        DatabaseHelper.initialize(getContentResolver());
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
