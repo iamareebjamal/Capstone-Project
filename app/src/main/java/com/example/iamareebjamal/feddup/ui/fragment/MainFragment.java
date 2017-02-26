@@ -202,6 +202,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onDetach();
         mListener = null;
         postAdapter.cleanup();
+        PostHolder.setFragmentInteractionListener(null);
         Picasso.with(getContext()).cancelTag(PostHolder.TAG);
 
         if(compositeSubscription != null) compositeSubscription.unsubscribe();
