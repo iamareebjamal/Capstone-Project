@@ -114,7 +114,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(postService -> {
                     drafts.add(postService);
-                    draftsAdapter.notifyDataSetChanged();
+                    draftsAdapter.notifyItemInserted(drafts.size());
                 }, throwable -> Log.d(TAG, "Cursor has closed"));
 
     }

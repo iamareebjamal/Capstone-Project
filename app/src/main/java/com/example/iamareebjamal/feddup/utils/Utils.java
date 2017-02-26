@@ -3,14 +3,25 @@ package com.example.iamareebjamal.feddup.utils;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.view.Menu;
 
 public class Utils {
+
+    public static void tintMenu(Menu menu, int color) {
+        for(int i = 0; i < menu.size(); i++) {
+            Drawable drawable = menu.getItem(i).getIcon();
+            drawable = DrawableCompat.wrap(drawable);
+            DrawableCompat.setTint(drawable, color);
+            menu.getItem(i).setIcon(drawable);
+        }
+    }
 
     public static String getFilePath(Context context, Uri uri) {
         String selection = null;

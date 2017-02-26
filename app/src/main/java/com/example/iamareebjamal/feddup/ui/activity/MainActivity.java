@@ -16,6 +16,8 @@ import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
 import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
+import com.example.iamareebjamal.feddup.utils.Utils;
+import com.facebook.stetho.common.Util;
 import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.BindView;
@@ -60,12 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Frag
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
 
-        for(int i = 0; i < menu.size(); i++) {
-            Drawable drawable = menu.getItem(i).getIcon();
-            drawable = DrawableCompat.wrap(drawable);
-            DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.white_translucent));
-            menu.getItem(i).setIcon(drawable);
-        }
+        Utils.tintMenu(menu, ContextCompat.getColor(this, R.color.white_translucent));
 
         return true;
     }
