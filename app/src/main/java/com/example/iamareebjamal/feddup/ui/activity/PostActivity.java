@@ -107,6 +107,7 @@ public class PostActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
+        created.subscribe(loaded -> Log.d(TAG, "Photo Loaded : " + loaded));
         handleIntentExtras();
 
         setupForm();
@@ -161,14 +162,16 @@ public class PostActivity extends AppCompatActivity {
                         .debounce(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread());
 
-        Subscription subscription = formObservable.subscribe(isValid -> {
-            if(isValid) {
-                textInputLayout.setError(null);
-                textInputLayout.setErrorEnabled(false);
-            } else {
-                textInputLayout.setErrorEnabled(true);
-                textInputLayout.setError(message);
-            }
+        Subscription subscription = formObservable
+                .skip(1)
+                .subscribe(isValid -> {
+                    if(isValid) {
+                        textInputLayout.setError(null);
+                        textInputLayout.setErrorEnabled(false);
+                    } else {
+                        textInputLayout.setErrorEnabled(true);
+                        textInputLayout.setError(message);
+                    }
         });
 
         compositeSubscription.add(subscription);
