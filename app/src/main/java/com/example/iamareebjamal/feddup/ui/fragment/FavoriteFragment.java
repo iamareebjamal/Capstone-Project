@@ -38,7 +38,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "MainFragment";
 
     private FragmentInteractionListener mListener;
@@ -56,7 +56,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
 
-    public MainFragment() {
+    public FavoriteFragment() {
         // Required empty public constructor
     }
 

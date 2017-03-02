@@ -1,11 +1,9 @@
 package com.example.iamareebjamal.feddup.ui.activity;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,17 +12,16 @@ import android.view.MenuItem;
 
 import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
-import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
 import com.example.iamareebjamal.feddup.utils.Utils;
-import com.facebook.stetho.common.Util;
 import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements MainFragment.FragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements FragmentInteractionListener {
 
     @BindView(com.example.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
