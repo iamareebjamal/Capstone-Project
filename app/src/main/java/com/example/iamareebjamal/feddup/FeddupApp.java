@@ -8,6 +8,7 @@ import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -34,6 +35,7 @@ public class FeddupApp extends Application {
 
         FirebaseApp.initializeApp(this);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        FirebaseMessaging.getInstance().subscribeToTopic("news");
 
         if(!BuildConfig.DEBUG) return;
 
