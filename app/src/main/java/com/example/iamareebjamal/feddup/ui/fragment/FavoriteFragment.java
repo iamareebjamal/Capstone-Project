@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
+import com.example.iamareebjamal.feddup.data.db.utils.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
@@ -175,7 +176,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     private void loadFavorites() {
         if(favoriteCursor == null) return;
 
-        PostHolder.clearFavorites();
+        DatabaseHelper.clearFavorites();
         posts.clear();
         cleanFirebaseListeners();
         Subscription subscription = FavoritesHelper
@@ -185,7 +186,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
                 .subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
-                        postCount = PostHolder.getFavoriteCount();
+                        postCount = DatabaseHelper.getFavoriteCount();
                     }
 
                     @Override
@@ -195,8 +196,8 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
 
                     @Override
                     public void onNext(String key) {
-                            PostHolder.addFavorite(key);
-                            insertFavorite(key);
+                        DatabaseHelper.addFavorite(key);
+                        insertFavorite(key);
                     }
                 });
 
@@ -206,13 +207,13 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     private void loadDownvotes() {
         if(downvotesCursor == null) return;
 
-        PostHolder.clearDownVoted();
+        DatabaseHelper.clearDownVoted();
         Subscription subscription = DownvotesHelper
                 .getDowvotesFromCursor(downvotesCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(key -> {
-                    PostHolder.addDownVoted(key);
+                    DatabaseHelper.addDownVoted(key);
                     postAdapter.notifyDataSetChanged();
                 }, throwable -> Log.d(TAG, "Cursor has closed"));
 
@@ -299,8 +300,8 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        PostHolder.clearDownVoted();
-        PostHolder.clearFavorites();
+        DatabaseHelper.clearDownVoted();
+        DatabaseHelper.clearFavorites();
         posts.clear();
         // No need to close cursor. Handled by loader
     }

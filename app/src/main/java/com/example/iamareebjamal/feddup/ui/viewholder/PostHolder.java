@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.iamareebjamal.feddup.R;
+import com.example.iamareebjamal.feddup.data.db.utils.DatabaseHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
@@ -22,9 +23,7 @@ import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,9 +42,6 @@ public class PostHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.title_bar) LinearLayout titleBar;
 
     private Context context;
-
-    private static Set<String> downvoted= new HashSet<>();
-    private static Set<String> favorites = new HashSet<>();
     private static FragmentInteractionListener fragmentInteractionListener;
 
     public PostHolder(View itemView) {
@@ -53,26 +49,6 @@ public class PostHolder extends RecyclerView.ViewHolder {
 
         ButterKnife.bind(this, itemView);
         context = itemView.getContext();
-    }
-
-    public static void addDownVoted(String key) {
-        downvoted.add(key);
-    }
-
-    public static void clearDownVoted() {
-        downvoted.clear();
-    }
-
-    public static void addFavorite(String key) {
-        favorites.add(key);
-    }
-
-    public static void clearFavorites() {
-        favorites.clear();
-    }
-
-    public static int getFavoriteCount() {
-        return favorites.size();
     }
 
     public static void setFragmentInteractionListener(FragmentInteractionListener
@@ -86,7 +62,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         title.setText(post.title);
         downvotes.setText(String.format(Locale.getDefault(), context.getString(R.string.downvotes_format), post.downvotes));
 
-        if(favorites.contains(key)){
+        if(DatabaseHelper.isFavorite(key)){
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));
             favorite.setOnClickListener(view ->
                     FavoritesHelper.removeFavorite(key)
@@ -110,7 +86,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
                         ));
         }
 
-        if(downvoted.contains(key)){
+        if(DatabaseHelper.isDownvoted(key)){
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down, null));
             downvote.setOnClickListener(view ->
                 DownvotesHelper.removeDownvote(key, post.downvotes)
