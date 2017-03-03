@@ -26,22 +26,31 @@ import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
+import com.example.iamareebjamal.feddup.ui.adapter.PostAdapter;
 import com.example.iamareebjamal.feddup.ui.viewholder.PostHolder;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.leakcanary.RefWatcher;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String TAG = "MainFragment";
+public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = "FavoriteFragment";
 
     private FragmentInteractionListener mListener;
 
@@ -56,9 +65,13 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @BindView(R.id.post_list) RecyclerView recyclerView;
     @BindView(R.id.empty_layout) FrameLayout emptyLayout;
 
-    private FirebaseRecyclerAdapter<Post, PostHolder> postAdapter;
+    private int postCount;
+    private List<Post> posts = new ArrayList<>();
+    private PostAdapter postAdapter = new PostAdapter();
 
-    public MainFragment() {
+    private Map<Query, ValueEventListener> firebaseListeners = new HashMap<>();
+
+    public FavoriteFragment() {
         // Required empty public constructor
     }
 
@@ -70,7 +83,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         ButterKnife.bind(this, root);
 
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null) actionBar.setTitle(getString(R.string.app_name));
+        if(actionBar != null) actionBar.setTitle(getString(R.string.favorites));
 
         setupList();
 
@@ -103,24 +116,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
         //    gridLayoutManager.setSpanCount(2);
 
-        Query postReference = FirebaseDatabase.getInstance().getReference("posts").orderByChild("downvotes").limitToFirst(10);
-
         PostHolder.setFragmentInteractionListener(mListener);
-        postAdapter = new FirebaseRecyclerAdapter<Post, PostHolder>(Post.class, R.layout.item_card, PostHolder.class, postReference) {
-            @Override
-            protected void populateViewHolder(PostHolder viewHolder, Post post, int position) {
-                String key = getRef(position).getKey();
-
-                if(!started) {
-                    started = true;
-                    if (mListener != null) mListener.onPostStart(key);
-                    emptyLayout.setVisibility(View.GONE);
-                }
-
-                post.key = key;
-                viewHolder.setPost(post);
-            }
-        };
 
         recyclerView.setAdapter(postAdapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
@@ -143,18 +139,66 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         });
     }
 
+    private void insertFavorite(String key) {
+        Query query = FirebaseDatabase.getInstance().getReference("posts").child(key);
+
+        ValueEventListener valueEventListener = query
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String key = dataSnapshot.getKey();
+                        Post post = dataSnapshot.getValue(Post.class);
+
+                        if(!started) {
+                            started = true;
+                            if (mListener != null) mListener.onPostStart(key);
+                            emptyLayout.setVisibility(View.GONE);
+                        }
+
+                        post.key = key;
+                        posts.add(post);
+
+                        if(posts.size() == postCount) {
+                            postAdapter.updateList(posts);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        firebaseListeners.put(query, valueEventListener);
+    }
+
     private void loadFavorites() {
         if(favoriteCursor == null) return;
 
         PostHolder.clearFavorites();
+        posts.clear();
+        cleanFirebaseListeners();
         Subscription subscription = FavoritesHelper
                 .getFavoritesFromCursor(favoriteCursor)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(key -> {
-                    PostHolder.addFavorite(key);
-                    postAdapter.notifyDataSetChanged();
-                }, throwable -> Log.d(TAG, "Cursor has closed"));
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        postCount = PostHolder.getFavoriteCount();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "Cursor has closed");
+                    }
+
+                    @Override
+                    public void onNext(String key) {
+                            PostHolder.addFavorite(key);
+                            insertFavorite(key);
+                    }
+                });
 
         compositeSubscription.add(subscription);
     }
@@ -202,11 +246,25 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        postAdapter.cleanup();
         PostHolder.setFragmentInteractionListener(null);
         Picasso.with(getContext()).cancelTag(PostHolder.TAG);
 
         if(compositeSubscription != null) compositeSubscription.unsubscribe();
+    }
+
+    private void cleanFirebaseListeners() {
+        for (Map.Entry<Query, ValueEventListener> entry : firebaseListeners.entrySet()) {
+            entry.getKey().removeEventListener(entry.getValue());
+        }
+
+        firebaseListeners.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        cleanFirebaseListeners();
     }
 
     @Override
@@ -243,6 +301,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoaderReset(Loader<Cursor> loader) {
         PostHolder.clearDownVoted();
         PostHolder.clearFavorites();
+        posts.clear();
         // No need to close cursor. Handled by loader
     }
 

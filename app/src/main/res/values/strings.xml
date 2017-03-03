@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Feddup</string>
-    <string name="title_activity_drafts">Drafts</string>
+    <string name="drafts">Drafts</string>
+    <string name="favorites">Favorites</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
     <string name="downvotes_format">-%d</string>
     <string name="post_title">Post Title</string>
     <string name="username">Username</string>

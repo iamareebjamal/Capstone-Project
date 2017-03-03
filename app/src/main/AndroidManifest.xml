@@ -34,7 +34,7 @@
 
         <activity
             android:name=".ui.activity.DraftsActivity"
-            android:label="@string/title_activity_drafts"
+            android:label="@string/drafts"
             android:theme="@style/AppTheme" />
     </application>
 

@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Save"
+        android:title="@string/save"
         android:id="@+id/save"
         android:icon="@drawable/ic_save"
         app:showAsAction="always" />
 
     <item
-        android:title="Delete"
+        android:title="@string/delete"
         android:id="@+id/delete"
         android:icon="@drawable/ic_delete"
         app:showAsAction="ifRoom" />

@@ -19,7 +19,6 @@ import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
-import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -72,13 +71,17 @@ public class PostHolder extends RecyclerView.ViewHolder {
         favorites.clear();
     }
 
+    public static int getFavoriteCount() {
+        return favorites.size();
+    }
+
     public static void setFragmentInteractionListener(FragmentInteractionListener
                                                               fragmentInteractionListener) {
         PostHolder.fragmentInteractionListener = fragmentInteractionListener;
     }
 
-    public void setPost(final Post post, final DatabaseReference reference){
-        String key = reference.getKey();
+    public void setPost(final Post post){
+        String key = post.key;
 
         title.setText(post.title);
         downvotes.setText(String.format(Locale.getDefault(), context.getString(R.string.downvotes_format), post.downvotes));
@@ -86,7 +89,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         if(favorites.contains(key)){
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));
             favorite.setOnClickListener(view ->
-                    FavoritesHelper.removeFavorite(reference.getKey())
+                    FavoritesHelper.removeFavorite(key)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(rows ->
@@ -97,7 +100,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         } else {
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart_outline, null));
             favorite.setOnClickListener(view ->
-                    FavoritesHelper.addFavorite(reference.getKey())
+                    FavoritesHelper.addFavorite(key)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(added ->
@@ -110,7 +113,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         if(downvoted.contains(key)){
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down, null));
             downvote.setOnClickListener(view ->
-                DownvotesHelper.removeDownvote(reference.getKey(), post.downvotes)
+                DownvotesHelper.removeDownvote(key, post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(rows ->
@@ -123,7 +126,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
         } else {
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down_outline, null));
             downvote.setOnClickListener(view ->
-                DownvotesHelper.addDownvote(reference.getKey(), post.downvotes)
+                DownvotesHelper.addDownvote(key, post.downvotes)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(added ->

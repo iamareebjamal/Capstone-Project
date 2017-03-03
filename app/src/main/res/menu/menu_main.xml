@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Drafts"
+        android:title="@string/drafts"
         android:id="@+id/drafts"
         android:icon="@drawable/ic_save"
         app:showAsAction="ifRoom" />
 
     <item
-        android:title="Favorites"
+        android:title="@string/favorites"
         android:id="@+id/favorites"
         android:icon="@drawable/ic_heart"
         app:showAsAction="always" />
