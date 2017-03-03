@@ -33,14 +33,14 @@
         android:baselineAligned="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <fragment
-            android:id="@+id/main_fragment"
-            android:name="com.example.iamareebjamal.feddup.ui.fragment.MainFragment"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            tools:layout="@layout/fragment_main" />
+            android:id="@+id/wrapper"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        </FrameLayout>
 
         <fragment
             android:id="@+id/detail_fragment"

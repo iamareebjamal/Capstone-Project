@@ -3,17 +3,20 @@ package com.example.iamareebjamal.feddup.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.iamareebjamal.feddup.FeddupApp;
 import com.example.iamareebjamal.feddup.R;
 import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
 import com.example.iamareebjamal.feddup.ui.fragment.DetailFragment;
+import com.example.iamareebjamal.feddup.ui.fragment.MainFragment;
 import com.example.iamareebjamal.feddup.utils.Utils;
 import com.squareup.leakcanary.RefWatcher;
 
@@ -36,6 +39,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.wrapper, new MainFragment());
+        fragmentTransaction.commit();
 
         detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
     }
@@ -72,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
                 finish();
             case R.id.drafts:
                 loadDrafts();
+                break;
+            case R.id.favorites:
+                Toast.makeText(this, "Click", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 // Do nothing
