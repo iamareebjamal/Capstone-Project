@@ -20,6 +20,7 @@ import com.example.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
 import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.example.iamareebjamal.feddup.data.models.Post;
 import com.example.iamareebjamal.feddup.ui.FragmentInteractionListener;
+import com.example.iamareebjamal.feddup.ui.widget.FavoritesWidget;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -68,6 +69,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
                     FavoritesHelper.removeFavorite(key)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(rows -> { if(rows != 0) FavoritesWidget.sendRefreshBroadcast(context); })
                         .subscribe(rows ->
                             Log.d("Removed", String.valueOf(rows))
                         , throwable ->
@@ -79,6 +81,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
                     FavoritesHelper.addFavorite(key)
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(added -> { if(added) FavoritesWidget.sendRefreshBroadcast(context); })
                         .subscribe(added ->
                             Log.d("Added", String.valueOf(added))
                         , throwable ->
