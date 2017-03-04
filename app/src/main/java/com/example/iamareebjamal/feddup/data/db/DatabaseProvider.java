@@ -3,6 +3,7 @@ package com.example.iamareebjamal.feddup.data.db;
 import android.net.Uri;
 
 import com.example.iamareebjamal.feddup.data.db.schema.DraftColumns;
+import com.example.iamareebjamal.feddup.data.db.schema.PostCacheColumns;
 import com.example.iamareebjamal.feddup.data.db.schema.PostColumns;
 
 import net.simonvt.schematic.annotation.ContentProvider;
@@ -57,17 +58,21 @@ public class DatabaseProvider {
         )
 
         public static final Uri CONTENT_URI = buildUri(Database.Favorites);
-        @InexactContentUri(
-                name = "FAVORITE_ID",
-                path = Database.Favorites + "/#",
-                type = "vnd.android.cursor.item/Favorite",
-                whereColumn = PostColumns.POST_KEY,
-                pathSegment = 1
-        )
 
-        public static Uri withId(String id) {
-            return buildUri(Database.Favorites, id);
-        }
+
+        public static final String[] JOIN_PROJECTION = new String[] {
+                PostCacheColumns.key,
+                PostCacheColumns.title,
+                PostCacheColumns.url
+        };
+
+        @ContentUri(
+                path = Database.Favorites + "/FAVORITE_JOIN",
+                type = "vnd.android.cursor.dir/CompoundFavorites",
+
+                join = "JOIN " + Database.PostCache + " ON " + PostColumns.POST_KEY + " = " + PostCacheColumns.key
+        )
+        public static Uri FAVORITE_DETAILS = buildUri(Database.Favorites, "FAVORITE_JOIN");
     }
 
     @TableEndpoint(table = Database.Downvotes)
@@ -78,17 +83,17 @@ public class DatabaseProvider {
         )
 
         public static final Uri CONTENT_URI = buildUri(Database.Downvotes);
-        @InexactContentUri(
-                name = "DOWNVOTE_ID",
-                path = Database.Downvotes + "/#",
-                type = "vnd.android.cursor.item/Downvote",
-                whereColumn = PostColumns.POST_KEY,
-                pathSegment = 1
+
+    }
+
+    @TableEndpoint(table = Database.PostCache)
+    public static class PostCache {
+        @ContentUri(
+                path = Database.PostCache,
+                type = "vnd.android.cursor.dir/PostCache"
         )
 
-        public static Uri withId(String id) {
-            return buildUri(Database.Downvotes, id);
-        }
+        public static final Uri CONTENT_URI = buildUri(Database.PostCache);
     }
 
 }

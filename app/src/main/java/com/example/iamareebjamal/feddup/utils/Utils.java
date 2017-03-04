@@ -2,6 +2,7 @@ package com.example.iamareebjamal.feddup.utils;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -10,9 +11,15 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.util.TypedValue;
 import android.view.Menu;
 
 public class Utils {
+
+    public static float getPx(Context context, int dp) {
+        Resources r = context.getResources();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
 
     public static void tintMenu(Menu menu, int color) {
         for(int i = 0; i < menu.size(); i++) {

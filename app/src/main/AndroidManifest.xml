@@ -36,6 +36,20 @@
             android:name=".ui.activity.DraftsActivity"
             android:label="@string/drafts"
             android:theme="@style/AppTheme" />
+
+        <receiver android:name=".ui.widget.FavoritesWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/favorites_widget_info" />
+        </receiver>
+
+        <service android:name=".ui.widget.FavoritesService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
     </application>
 
 </manifest>

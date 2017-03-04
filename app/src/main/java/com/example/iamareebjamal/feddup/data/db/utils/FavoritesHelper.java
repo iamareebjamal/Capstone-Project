@@ -6,9 +6,16 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.example.iamareebjamal.feddup.data.db.DatabaseProvider;
+import com.example.iamareebjamal.feddup.data.db.schema.PostCacheColumns;
 import com.example.iamareebjamal.feddup.data.db.schema.PostColumns;
+import com.example.iamareebjamal.feddup.data.models.Post;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 public class FavoritesHelper {
 
@@ -20,7 +27,7 @@ public class FavoritesHelper {
 
     private static void verify() {
         if(contentResolver == null)
-            throw new IllegalAccessError("FavoriesHelper : Must call initialize with ContentResolver first");
+            throw new IllegalAccessError("FavoritesHelper : Must call initialize with ContentResolver first");
     }
 
     public static Observable<String> getFavoritesFromCursor(Cursor cursor) {
@@ -56,6 +63,64 @@ public class FavoritesHelper {
         });
     }
 
+    public static Observable<Post> getFavoritePostsFromCursor(Cursor cursor) {
+        return Observable.create(subscriber -> {
+            if (cursor != null) {
+                cursor.moveToFirst();
+
+                while (!cursor.isAfterLast()) {
+                    Post post = new Post();
+                    post.key = cursor.getString(cursor.getColumnIndex(PostCacheColumns.key));
+                    post.title = cursor.getString(cursor.getColumnIndex(PostCacheColumns.title));
+                    post.url = cursor.getString(cursor.getColumnIndex(PostCacheColumns.url));
+
+                    subscriber.onNext(post);
+                    cursor.moveToNext();
+                }
+            }
+            subscriber.onCompleted();
+        });
+    }
+
+    private static void addOrUpdateCache(String key) {
+        verify();
+
+        Observable.fromCallable(() -> {
+            ContentValues values = new ContentValues();
+            values.put(PostCacheColumns.key, key);
+            values.put(PostCacheColumns.key, key);
+
+            FirebaseDatabase.getInstance().getReference("posts").child(key)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Post post = dataSnapshot.getValue(Post.class);
+                            values.put(PostCacheColumns.title, post.title);
+                            values.put(PostCacheColumns.url, post.url);
+
+                            int rows = contentResolver.update(
+                                    DatabaseProvider.PostCache.CONTENT_URI, values,
+                                    PostCacheColumns.key + "=?",
+                                    new String[]{ key }
+                            );
+
+                            if (rows == 0)
+                                contentResolver.insert(
+                                        DatabaseProvider.PostCache.CONTENT_URI,
+                                        values
+                                );
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+            return null;
+        }).subscribeOn(Schedulers.computation()).subscribe();
+
+    }
+
     public static Observable<Boolean> addFavorite(String key) {
         verify();
 
@@ -65,6 +130,8 @@ public class FavoritesHelper {
 
             Uri uri = contentResolver.insert(DatabaseProvider.Favorites.CONTENT_URI,
                     values);
+
+            addOrUpdateCache(key);
 
             subscriber.onNext(uri);
             subscriber.onCompleted();

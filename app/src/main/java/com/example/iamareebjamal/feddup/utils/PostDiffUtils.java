@@ -1,7 +1,6 @@
 package com.example.iamareebjamal.feddup.utils;
 
 import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 
 import com.example.iamareebjamal.feddup.data.models.Post;
 

@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.example.iamareebjamal.feddup.data.db.utils.DatabaseHelper;
-import com.example.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.facebook.stetho.Stetho;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;

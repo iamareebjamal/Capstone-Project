@@ -6,11 +6,11 @@ import net.simonvt.schematic.annotation.PrimaryKey;
 
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
-public class PostColumns {
+public interface PostColumns {
 
     @DataType(TEXT)
     @PrimaryKey
     @NotNull
-    public static final String POST_KEY = "post_key";
+    String POST_KEY = "post_key";
 
 }
