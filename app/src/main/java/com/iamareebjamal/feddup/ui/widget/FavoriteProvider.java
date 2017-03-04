@@ -1,6 +1,7 @@
 package com.iamareebjamal.feddup.ui.widget;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
@@ -14,6 +15,7 @@ import com.iamareebjamal.feddup.R;
 import com.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.iamareebjamal.feddup.data.db.utils.FavoritesHelper;
 import com.iamareebjamal.feddup.data.models.Post;
+import com.iamareebjamal.feddup.ui.fragment.DetailFragment;
 import com.iamareebjamal.feddup.utils.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -92,13 +94,16 @@ class FavoriteProvider implements RemoteViewsService.RemoteViewsFactory {
             Palette.from(bitmap).generate(palette -> {
                 Palette.Swatch swatch = palette.getVibrantSwatch();
 
-                if(swatch != null) {
+                if(swatch != null)
                     remoteViews.setInt(R.id.title_bar, "setBackgroundColor", swatch.getRgb());
-                }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtra(DetailFragment.KEY, post.key);
+        remoteViews.setOnClickFillInIntent(R.id.root_view, fillInIntent);
 
         return remoteViews;
     }

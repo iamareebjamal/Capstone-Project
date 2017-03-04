@@ -50,6 +50,13 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
         toggleFragments();
 
         detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.detail_fragment);
+
+        Intent extra = getIntent();
+        if (extra.hasExtra(DetailFragment.KEY)) {
+            String key = extra.getStringExtra(DetailFragment.KEY);
+
+            onPostSelect(key);
+        }
     }
 
     public boolean isDualPane() {

@@ -1,5 +1,6 @@
 package com.iamareebjamal.feddup.ui.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.iamareebjamal.feddup.R;
+import com.iamareebjamal.feddup.ui.activity.MainActivity;
 
 public class FavoritesWidget extends AppWidgetProvider {
     private static final String REFRESH_ACTION = "feddup.action.REFRESH";
@@ -18,6 +20,14 @@ public class FavoritesWidget extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
         views.setRemoteAdapter(R.id.list_view, new Intent(context, FavoritesService.class));
+
+        Intent launch = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launch, 0);
+        views.setPendingIntentTemplate(R.id.list_view, pendingIntent);
+
+        launch = new Intent(context, MainActivity.class);
+        pendingIntent = PendingIntent.getActivity(context, 0, launch, 0);
+        views.setOnClickPendingIntent(R.id.widget_root, pendingIntent);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list_view);
