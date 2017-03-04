@@ -12,10 +12,20 @@ android {
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
     }
+    signingConfigs {
+        release {
+            storeFile file("../release.keystore")
+            storePassword "feddup_keypass"
+            keyAlias "iamfeddup"
+            keyPassword "deff@re"
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
