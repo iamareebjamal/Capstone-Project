@@ -2,6 +2,7 @@ package com.iamareebjamal.feddup;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.iamareebjamal.feddup.data.db.utils.DatabaseHelper;
 import com.google.firebase.FirebaseApp;
@@ -28,6 +29,8 @@ public class FeddupApp extends Application {
             return;
         }
         refWatcher = LeakCanary.install(this);
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         DatabaseHelper.initialize(getContentResolver());
 
