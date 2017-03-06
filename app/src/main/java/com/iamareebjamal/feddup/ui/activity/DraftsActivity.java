@@ -59,7 +59,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
-        if(ab != null) {
+        if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
             ab.setDefaultDisplayHomeAsUpEnabled(true);
         }
@@ -76,14 +76,14 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
             gridLayoutManager.setSpanCount(2);
 
         recyclerView.setAdapter(draftsAdapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0 || dy < 0 && fab.isShown())
                     fab.hide();
 
@@ -105,9 +105,9 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
         drafts.clear();
         draftsAdapter.notifyDataSetChanged();
 
-        if(cursor == null) return;
+        if (cursor == null) return;
 
-        if(subscription != null) subscription.unsubscribe();
+        if (subscription != null) subscription.unsubscribe();
 
         subscription = DraftsHelper.getDraftsFromCursor(cursor)
                 .subscribeOn(Schedulers.computation())
@@ -121,7 +121,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
 
     @OnClick(R.id.fab)
     public void startPostActivity() {
-       startActivity(new Intent(this, PostActivity.class));
+        startActivity(new Intent(this, PostActivity.class));
     }
 
     @Override
@@ -160,7 +160,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     public void onDestroy() {
         super.onDestroy();
 
-        if(subscription != null) subscription.unsubscribe();
+        if (subscription != null) subscription.unsubscribe();
 
         RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
         refWatcher.watch(this);

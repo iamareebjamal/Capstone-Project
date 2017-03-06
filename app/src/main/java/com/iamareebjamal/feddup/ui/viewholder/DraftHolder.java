@@ -49,13 +49,13 @@ public class DraftHolder extends RecyclerView.ViewHolder {
     }
 
     public void setDraft(PostDraft post) {
-        if(post.getTitle() != null) {
+        if (post.getTitle() != null) {
             title.setText(post.getTitle());
         } else {
             title.clearComposingText();
         }
 
-        if(post.getFilePath() != null) {
+        if (post.getFilePath() != null) {
             Picasso.with(context)
                     .load(new File(post.getFilePath()))
                     .fit()
@@ -67,9 +67,10 @@ public class DraftHolder extends RecyclerView.ViewHolder {
                             Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
                             Palette.from(bitmap).generate(palette -> {
                                 Palette.Swatch swatch = palette.getVibrantSwatch();
-                                if(swatch != null) {
+                                if (swatch != null) {
                                     titleBar.setBackgroundColor(swatch.getRgb());
-                                    DrawableCompat.setTint(DrawableCompat.wrap(delete.getDrawable()), swatch.getBodyTextColor());
+                                    DrawableCompat.setTint(DrawableCompat.wrap(delete.getDrawable()),
+                                            swatch.getBodyTextColor());
 
                                     title.setTextColor(swatch.getTitleTextColor());
                                 }
@@ -81,12 +82,12 @@ public class DraftHolder extends RecyclerView.ViewHolder {
         }
 
         delete.setOnClickListener(view ->
-            DraftsHelper.deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(rows -> {
-                        Toast.makeText(context, context.getString(R.string.draft_deleted), Toast.LENGTH_SHORT).show();
-                    }, throwable -> Log.d("Error", "Can't delete"))
+                DraftsHelper.deleteUri(DatabaseProvider.Drafts.withId(post.getId()))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(rows -> {
+                            Toast.makeText(context, context.getString(R.string.draft_deleted), Toast.LENGTH_SHORT).show();
+                        }, throwable -> Log.d("Error", "Can't delete"))
         );
 
         panel.setOnClickListener(view -> {

@@ -27,10 +27,11 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements FragmentInteractionListener {
 
+    private static final String FAVORITE = "favorite";
+
     @BindView(com.iamareebjamal.feddup.R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.fab) FloatingActionButton fab;
 
-    private static final String FAVORITE = "favorite";
     private boolean showFavorite = false;
 
     private DetailFragment detailFragment;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
 
         setSupportActionBar(toolbar);
 
-        if(savedInstanceState != null)
+        if (savedInstanceState != null)
             showFavorite = savedInstanceState.getBoolean(FAVORITE, true);
 
         toggleFragments();
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     }
 
     public boolean isDualPane() {
-        return detailFragment!=null && detailFragment.isInLayout();
+        return detailFragment != null && detailFragment.isInLayout();
     }
 
     private void loadDrafts() {
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     }
 
     @OnClick(R.id.fab)
-    public void startPostActivity(){
+    public void startPostActivity() {
         startActivity(new Intent(this, PostActivity.class));
     }
 
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
 
     private void toggleFragments() {
         Fragment newFragment;
-        if(showFavorite)
+        if (showFavorite)
             newFragment = new FavoriteFragment();
         else
             newFragment = new MainFragment();
@@ -125,16 +126,16 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
 
     @Override
     public void onFabDisplay(boolean show) {
-        if(show) {
-            if(!fab.isShown()) fab.show();
+        if (show) {
+            if (!fab.isShown()) fab.show();
         } else {
-            if(fab.isShown()) fab.hide();
+            if (fab.isShown()) fab.hide();
         }
     }
 
     @Override
     public void onPostSelect(String key) {
-        if(isDualPane()) {
+        if (isDualPane()) {
             detailFragment.setKey(key);
             return;
         }

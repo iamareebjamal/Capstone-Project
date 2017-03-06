@@ -24,15 +24,15 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.iamareebjamal.feddup.FeddupApp;
-import com.iamareebjamal.feddup.R;
-import com.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
-import com.iamareebjamal.feddup.data.models.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.iamareebjamal.feddup.FeddupApp;
+import com.iamareebjamal.feddup.R;
+import com.iamareebjamal.feddup.data.db.utils.DownvotesHelper;
+import com.iamareebjamal.feddup.data.models.Post;
 import com.squareup.leakcanary.RefWatcher;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -52,9 +52,8 @@ import rx.subscriptions.CompositeSubscription;
 
 public class DetailFragment extends Fragment {
 
-    private static final String TAG = "DetailFragment";
     public static final String KEY = "key";
-    private String key;
+    private static final String TAG = "DetailFragment";
 
     @BindView(R.id.main_content) CoordinatorLayout rootLayout;
     @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
@@ -70,6 +69,7 @@ public class DetailFragment extends Fragment {
     @BindView(R.id.downvote) FloatingActionButton downvote;
     @BindView(R.id.empty_layout) FrameLayout emptyLayout;
 
+    private String key;
     private Query query;
     private Post post;
     private ValueEventListener valueEventListener;
@@ -80,7 +80,7 @@ public class DetailFragment extends Fragment {
             Log.d(TAG, "Error " + throwable.getMessage());
 
     private View.OnClickListener addDownvote = view -> {
-        if(post == null) return;
+        if (post == null) return;
 
         Subscription subscription = DownvotesHelper.addDownvote(key, post.downvotes)
                 .subscribeOn(Schedulers.computation())
@@ -91,7 +91,7 @@ public class DetailFragment extends Fragment {
     };
 
     private View.OnClickListener removeDownvote = view -> {
-        if(post == null) return;
+        if (post == null) return;
 
         Subscription subscription = DownvotesHelper.removeDownvote(key, post.downvotes)
                 .subscribeOn(Schedulers.computation())
@@ -101,12 +101,20 @@ public class DetailFragment extends Fragment {
         compositeSubscription.add(subscription);
     };
 
-    public DetailFragment() { }
+    public DetailFragment() {
+    }
+
+    public static int getDarkColor(int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.8f;
+        return Color.HSVToColor(hsv);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root =  inflater.inflate(R.layout.fragment_detail, container, false);
+        View root = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, root);
 
         collapsingToolbarLayout.setExpandedTitleColor(ContextCompat.getColor(getContext(), R.color.white_transparent));
@@ -131,7 +139,7 @@ public class DetailFragment extends Fragment {
         this.key = key;
         emptyLayout.setVisibility(View.GONE);
 
-        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+        if (compositeSubscription != null) compositeSubscription.unsubscribe();
 
         compositeSubscription = new CompositeSubscription();
 
@@ -148,7 +156,7 @@ public class DetailFragment extends Fragment {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        query = FirebaseDatabase.getInstance().getReference("posts/"+key);
+        query = FirebaseDatabase.getInstance().getReference("posts/" + key);
 
         valueEventListener = query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -191,7 +199,7 @@ public class DetailFragment extends Fragment {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(downvoted -> {
-                    if(downvoted) {
+                    if (downvoted) {
                         downvote.setImageDrawable(VectorDrawableCompat
                                 .create(getResources(), R.drawable.ic_thumb_down_outline, null));
 
@@ -207,15 +215,8 @@ public class DetailFragment extends Fragment {
         compositeSubscription.add(dbSubscription);
     }
 
-    public static int getDarkColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f;
-        return Color.HSVToColor(hsv);
-    }
-
     private void setColors(Palette.Swatch swatch) {
-        if(swatch == null)
+        if (swatch == null)
             return;
 
         int mainColor = swatch.getRgb();
@@ -241,7 +242,7 @@ public class DetailFragment extends Fragment {
                 .load(photoUrl)
                 .placeholder(VectorDrawableCompat.create(getContext().getResources(), R.drawable.ic_photo, null))
                 .tag(TAG)
-                .into(backdrop, new Callback.EmptyCallback(){
+                .into(backdrop, new Callback.EmptyCallback() {
                     @Override
                     public void onSuccess() {
                         progressBar.setVisibility(View.GONE);
@@ -257,15 +258,16 @@ public class DetailFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        if(query != null) query.removeEventListener(valueEventListener);
-        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+        if (query != null) query.removeEventListener(valueEventListener);
+        if (compositeSubscription != null) compositeSubscription.unsubscribe();
 
         Picasso.with(getContext()).cancelTag(TAG);
 
         super.onDetach();
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         RefWatcher refWatcher = FeddupApp.getRefWatcher(getActivity());
         refWatcher.watch(this);

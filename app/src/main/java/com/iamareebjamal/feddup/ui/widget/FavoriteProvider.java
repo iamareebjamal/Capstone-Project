@@ -67,7 +67,7 @@ class FavoriteProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDestroy() {
-        if(cursor != null) cursor.close();
+        if (cursor != null) cursor.close();
     }
 
     @Override
@@ -94,7 +94,7 @@ class FavoriteProvider implements RemoteViewsService.RemoteViewsFactory {
             Palette.from(bitmap).generate(palette -> {
                 Palette.Swatch swatch = palette.getVibrantSwatch();
 
-                if(swatch != null)
+                if (swatch != null)
                     remoteViews.setInt(R.id.title_bar, "setBackgroundColor", swatch.getRgb());
             });
         } catch (IOException e) {

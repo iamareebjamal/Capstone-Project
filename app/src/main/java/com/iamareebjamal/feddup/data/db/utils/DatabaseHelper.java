@@ -1,12 +1,13 @@
 package com.iamareebjamal.feddup.data.db.utils;
 
 import android.content.ContentResolver;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class DatabaseHelper {
 
-    private static Set<String> downvoted= new HashSet<>();
+    private static Set<String> downvoted = new HashSet<>();
     private static Set<String> favorites = new HashSet<>();
 
     public static void addDownVoted(String key) {

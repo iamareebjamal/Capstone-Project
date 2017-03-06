@@ -13,11 +13,11 @@ import net.simonvt.schematic.annotation.TableEndpoint;
 
 @ContentProvider(authority = DatabaseProvider.AUTHORITY,
         database = Database.class,
-        packageName="com.iamareebjamal.feddup.data.db.provider"
+        packageName = "com.iamareebjamal.feddup.data.db.provider"
 )
 public class DatabaseProvider {
 
-    static final String AUTHORITY =  "iamareebjamal.feddup.DatabaseProvider";
+    static final String AUTHORITY = "iamareebjamal.feddup.DatabaseProvider";
 
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
@@ -37,6 +37,7 @@ public class DatabaseProvider {
         )
 
         public static final Uri CONTENT_URI = buildUri(Database.Drafts);
+
         @InexactContentUri(
                 name = "DRAFT_ID",
                 path = Database.Drafts + "/#",
@@ -60,7 +61,7 @@ public class DatabaseProvider {
         public static final Uri CONTENT_URI = buildUri(Database.Favorites);
 
 
-        public static final String[] JOIN_PROJECTION = new String[] {
+        public static final String[] JOIN_PROJECTION = new String[]{
                 PostCacheColumns.key,
                 PostCacheColumns.title,
                 PostCacheColumns.url

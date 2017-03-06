@@ -27,7 +27,7 @@ public class PostUploader {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            if(postUploadListener != null) postUploadListener.onStart();
+            if (postUploadListener != null) postUploadListener.onStart();
         }
 
         @Override
@@ -45,13 +45,13 @@ public class PostUploader {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
 
-            if(postUploadListener == null) return;
+            if (postUploadListener == null) return;
 
-            if(o instanceof Response && ((Response) o).isSuccessful()) {
+            if (o instanceof Response && ((Response) o).isSuccessful()) {
                 postUploadListener.onSuccess((PostConfirmation) ((Response) o).body());
-            } else if(o instanceof Response && !((Response) o).isSuccessful()) {
+            } else if (o instanceof Response && !((Response) o).isSuccessful()) {
                 postUploadListener.onNetworkError((Response) o);
-            } else if(o instanceof Throwable) {
+            } else if (o instanceof Throwable) {
                 postUploadListener.onError((Throwable) o);
             }
         }

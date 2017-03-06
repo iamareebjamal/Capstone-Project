@@ -33,6 +33,7 @@ import rx.schedulers.Schedulers;
 
 public class PostHolder extends RecyclerView.ViewHolder {
     public static final String TAG = "PostHolder";
+    private static FragmentInteractionListener fragmentInteractionListener;
 
     @BindView(R.id.rootcard) CardView panel;
     @BindView(R.id.title) TextView title;
@@ -43,7 +44,6 @@ public class PostHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.title_bar) LinearLayout titleBar;
 
     private Context context;
-    private static FragmentInteractionListener fragmentInteractionListener;
 
     public PostHolder(View itemView) {
         super(itemView);
@@ -57,69 +57,73 @@ public class PostHolder extends RecyclerView.ViewHolder {
         PostHolder.fragmentInteractionListener = fragmentInteractionListener;
     }
 
-    public void setPost(final Post post){
+    public void setPost(final Post post) {
         String key = post.key;
 
         title.setText(post.title);
         downvotes.setText(String.format(Locale.getDefault(), context.getString(R.string.downvotes_format), post.downvotes));
 
-        if(DatabaseHelper.isFavorite(key)){
+        if (DatabaseHelper.isFavorite(key)) {
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart, null));
             favorite.setOnClickListener(view ->
                     FavoritesHelper.removeFavorite(key)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(rows -> { if(rows != 0) FavoritesWidget.sendRefreshBroadcast(context); })
-                        .subscribe(rows ->
-                            Log.d("Removed", String.valueOf(rows))
-                        , throwable ->
-                            Log.d("Error", throwable.getMessage())
-                        ));
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnNext(rows -> {
+                                if (rows != 0) FavoritesWidget.sendRefreshBroadcast(context);
+                            })
+                            .subscribe(rows ->
+                                            Log.d("Removed", String.valueOf(rows))
+                                    , throwable ->
+                                            Log.d("Error", throwable.getMessage())
+                            ));
         } else {
             favorite.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_heart_outline, null));
             favorite.setOnClickListener(view ->
                     FavoritesHelper.addFavorite(key)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(added -> { if(added) FavoritesWidget.sendRefreshBroadcast(context); })
-                        .subscribe(added ->
-                            Log.d("Added", String.valueOf(added))
-                        , throwable ->
-                            Log.d("Error", throwable.getMessage())
-                        ));
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnNext(added -> {
+                                if (added) FavoritesWidget.sendRefreshBroadcast(context);
+                            })
+                            .subscribe(added ->
+                                            Log.d("Added", String.valueOf(added))
+                                    , throwable ->
+                                            Log.d("Error", throwable.getMessage())
+                            ));
         }
 
-        if(DatabaseHelper.isDownvoted(key)){
+        if (DatabaseHelper.isDownvoted(key)) {
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down, null));
             downvote.setOnClickListener(view ->
-                DownvotesHelper.removeDownvote(key, post.downvotes)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(rows ->
-                            Log.d("Removed", String.valueOf(rows))
-                        , throwable ->
-                            Log.d("Error", throwable.getMessage())
-                        )
+                    DownvotesHelper.removeDownvote(key, post.downvotes)
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(rows ->
+                                            Log.d("Removed", String.valueOf(rows))
+                                    , throwable ->
+                                            Log.d("Error", throwable.getMessage())
+                            )
             );
 
         } else {
             downvote.setImageDrawable(VectorDrawableCompat.create(context.getResources(), R.drawable.ic_thumb_down_outline, null));
             downvote.setOnClickListener(view ->
-                DownvotesHelper.addDownvote(key, post.downvotes)
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(added ->
-                            Log.d("Added", String.valueOf(added))
-                        , throwable ->
-                            Log.d("Error", throwable.getMessage())
-                        )
+                    DownvotesHelper.addDownvote(key, post.downvotes)
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(added ->
+                                            Log.d("Added", String.valueOf(added))
+                                    , throwable ->
+                                            Log.d("Error", throwable.getMessage())
+                            )
             );
 
         }
 
         Palette.PaletteAsyncListener asyncListener = palette -> {
             Palette.Swatch swatch = palette.getVibrantSwatch();
-            if(swatch != null) {
+            if (swatch != null) {
                 titleBar.setBackgroundColor(swatch.getRgb());
                 DrawableCompat.setTint(DrawableCompat.wrap(favorite.getDrawable()), swatch.getBodyTextColor());
                 DrawableCompat.setTint(DrawableCompat.wrap(downvote.getDrawable()), swatch.getBodyTextColor());
@@ -144,7 +148,7 @@ public class PostHolder extends RecyclerView.ViewHolder {
                 });
 
         panel.setOnClickListener(view -> {
-            if(fragmentInteractionListener == null) return;
+            if (fragmentInteractionListener == null) return;
 
             fragmentInteractionListener.onPostSelect(key);
         });

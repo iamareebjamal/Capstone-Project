@@ -26,5 +26,6 @@ class Database {
     @Table(PostCacheColumns.class)
     static final String PostCache = "PostCache";
 
-    private Database(){ }
+    private Database() {
+    }
 }

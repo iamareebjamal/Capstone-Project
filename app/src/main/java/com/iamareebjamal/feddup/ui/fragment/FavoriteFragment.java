@@ -19,6 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.iamareebjamal.feddup.FeddupApp;
 import com.iamareebjamal.feddup.R;
 import com.iamareebjamal.feddup.data.db.DatabaseProvider;
@@ -29,11 +34,6 @@ import com.iamareebjamal.feddup.data.models.Post;
 import com.iamareebjamal.feddup.ui.FragmentInteractionListener;
 import com.iamareebjamal.feddup.ui.adapter.PostAdapter;
 import com.iamareebjamal.feddup.ui.viewholder.PostHolder;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.leakcanary.RefWatcher;
 import com.squareup.picasso.Picasso;
 
@@ -53,24 +53,25 @@ import rx.subscriptions.CompositeSubscription;
 public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "FavoriteFragment";
 
-    private FragmentInteractionListener mListener;
-
     private static final int FAVORITE_LOADER = 1;
     private static final int DOWNVOTES_CURSOR = 2;
+
+    @BindView(R.id.post_list) RecyclerView recyclerView;
+    @BindView(R.id.empty_layout) FrameLayout emptyLayout;
+
+    private FragmentInteractionListener mListener;
 
     private Cursor favoriteCursor;
     private Cursor downvotesCursor;
 
     private CompositeSubscription compositeSubscription;
 
-    @BindView(R.id.post_list) RecyclerView recyclerView;
-    @BindView(R.id.empty_layout) FrameLayout emptyLayout;
-
     private int postCount;
     private List<Post> posts = new ArrayList<>();
     private PostAdapter postAdapter = new PostAdapter();
 
     private Map<Query, ValueEventListener> firebaseListeners = new HashMap<>();
+    private boolean moveUp, started;
 
     public FavoriteFragment() {
         // Required empty public constructor
@@ -83,8 +84,8 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
 
         ButterKnife.bind(this, root);
 
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(actionBar != null) actionBar.setTitle(getString(R.string.favorites));
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle(getString(R.string.favorites));
 
         setupList();
 
@@ -107,22 +108,21 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
         return (xlarge || large);
     }
 
-    private boolean moveUp, started;
-    public void setupList(){
+    public void setupList() {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
             gridLayoutManager.setSpanCount(2);
 
         PostHolder.setFragmentInteractionListener(mListener);
 
         recyclerView.setAdapter(postAdapter);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0 || dy < 0)
                     onFabHide();
 
@@ -150,7 +150,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
                         String key = dataSnapshot.getKey();
                         Post post = dataSnapshot.getValue(Post.class);
 
-                        if(!started) {
+                        if (!started) {
                             started = true;
                             if (mListener != null) mListener.onPostStart(key);
                             emptyLayout.setVisibility(View.GONE);
@@ -159,7 +159,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
                         post.key = key;
                         posts.add(post);
 
-                        if(posts.size() == postCount) {
+                        if (posts.size() == postCount) {
                             postAdapter.updateList(posts);
                         }
                     }
@@ -174,7 +174,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void loadFavorites() {
-        if(favoriteCursor == null) return;
+        if (favoriteCursor == null) return;
 
         DatabaseHelper.clearFavorites();
         posts.clear();
@@ -205,7 +205,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void loadDownvotes() {
-        if(downvotesCursor == null) return;
+        if (downvotesCursor == null) return;
 
         DatabaseHelper.clearDownVoted();
         Subscription subscription = DownvotesHelper
@@ -250,7 +250,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
         PostHolder.setFragmentInteractionListener(null);
         Picasso.with(getContext()).cancelTag(PostHolder.TAG);
 
-        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+        if (compositeSubscription != null) compositeSubscription.unsubscribe();
     }
 
     private void cleanFirebaseListeners() {
@@ -270,7 +270,7 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(id == FAVORITE_LOADER)
+        if (id == FAVORITE_LOADER)
             return new CursorLoader(getContext(), DatabaseProvider.Favorites.CONTENT_URI, null, null, null, null);
         else
             return new CursorLoader(getContext(), DatabaseProvider.Downvotes.CONTENT_URI, null, null, null, null);
@@ -280,14 +280,14 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case FAVORITE_LOADER:
-                if(favoriteCursor != null) favoriteCursor.close();
+                if (favoriteCursor != null) favoriteCursor.close();
 
                 favoriteCursor = data;
 
                 loadFavorites();
                 break;
             case DOWNVOTES_CURSOR:
-                if(downvotesCursor != null) downvotesCursor.close();
+                if (downvotesCursor != null) downvotesCursor.close();
 
                 downvotesCursor = data;
 
@@ -306,7 +306,8 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
         // No need to close cursor. Handled by loader
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         super.onDestroyView();
         RefWatcher refWatcher = FeddupApp.getRefWatcher(getActivity());
         refWatcher.watch(this);

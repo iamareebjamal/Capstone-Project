@@ -14,10 +14,14 @@ public class FeddupApi {
                     .build();
 
     private static FeddupService feddupService =
-                    retrofit.create(FeddupService.class);
+            retrofit.create(FeddupService.class);
 
-    public static Retrofit retrofit() { return retrofit;}
+    public static Retrofit retrofit() {
+        return retrofit;
+    }
 
-    public static FeddupService getFeddupService() { return feddupService; }
+    public static FeddupService getFeddupService() {
+        return feddupService;
+    }
 
 }

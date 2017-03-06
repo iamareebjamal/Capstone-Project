@@ -20,7 +20,7 @@ public class DraftsHelper {
     }
 
     private static void verify() {
-        if(contentResolver == null)
+        if (contentResolver == null)
             throw new IllegalAccessError("DraftsHelper : Must call initialize with ContentResolver first");
     }
 

@@ -5,9 +5,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.iamareebjamal.feddup.data.db.schema.PostColumns;
-import com.google.firebase.database.FirebaseDatabase;
 
 import rx.Observable;
 
@@ -20,7 +20,7 @@ public class DownvotesHelper {
     }
 
     private static void verify() {
-        if(contentResolver == null)
+        if (contentResolver == null)
             throw new IllegalAccessError("DownvotesHelper : Must call initialize with ContentResolver first");
     }
 
@@ -51,7 +51,7 @@ public class DownvotesHelper {
 
             Observable<String> results = getDowvotesFromCursor(cursor);
 
-            if(cursor != null) cursor.close();
+            if (cursor != null) cursor.close();
 
             return results;
         });
@@ -68,9 +68,9 @@ public class DownvotesHelper {
                     new String[]{key},
                     null);
 
-            subscriber.onNext(cursor!= null && cursor.getCount() > 0);
+            subscriber.onNext(cursor != null && cursor.getCount() > 0);
 
-            if(cursor != null) cursor.close();
+            if (cursor != null) cursor.close();
 
             subscriber.onCompleted();
         });
@@ -86,11 +86,11 @@ public class DownvotesHelper {
             Uri uri = contentResolver.insert(DatabaseProvider.Downvotes.CONTENT_URI,
                     values);
 
-            if(uri != null)
+            if (uri != null)
                 FirebaseDatabase.getInstance()
-                    .getReference("posts/"+key)
-                    .child("downvotes")
-                    .setValue(currentValue + 1);
+                        .getReference("posts/" + key)
+                        .child("downvotes")
+                        .setValue(currentValue + 1);
 
             subscriber.onNext(uri);
             subscriber.onCompleted();
@@ -107,9 +107,9 @@ public class DownvotesHelper {
 
             if (rows > 0)
                 FirebaseDatabase.getInstance()
-                    .getReference("posts/"+key)
-                    .child("downvotes")
-                    .setValue(currentValue - 1);
+                        .getReference("posts/" + key)
+                        .child("downvotes")
+                        .setValue(currentValue - 1);
 
             subscriber.onNext(rows);
             subscriber.onCompleted();

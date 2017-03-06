@@ -22,7 +22,7 @@ public class Utils {
     }
 
     public static void tintMenu(Menu menu, int color) {
-        for(int i = 0; i < menu.size(); i++) {
+        for (int i = 0; i < menu.size(); i++) {
             Drawable drawable = menu.getItem(i).getIcon();
             drawable = DrawableCompat.wrap(drawable);
             DrawableCompat.setTint(drawable, color);
@@ -61,13 +61,13 @@ public class Utils {
             }
         }
         if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = { MediaStore.Images.Media.DATA };
+            String[] projection = {MediaStore.Images.Media.DATA};
             Cursor cursor = null;
             try {
                 cursor = context.getContentResolver()
                         .query(uri, projection, selection, selectionArgs, null);
 
-                if(cursor == null)
+                if (cursor == null)
                     return null;
 
                 int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -75,7 +75,7 @@ public class Utils {
                     return cursor.getString(column_index);
                 }
             } finally {
-                if(cursor != null) cursor.close();
+                if (cursor != null) cursor.close();
             }
         } else if ("file".equalsIgnoreCase(uri.getScheme())) {
             return uri.getPath();

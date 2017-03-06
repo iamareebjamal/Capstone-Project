@@ -68,15 +68,11 @@ public class PostActivity extends AppCompatActivity {
     private static final String TAG = "PostActivity";
     private static final String IMAGE_TAG = "image";
     private static final int PICK_IMAGE = 34;
-    private String filePath;
-    private Uri draftUri;
-    private boolean save = true;
 
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.postImage) ImageView postImage;
     @BindView(R.id.post) FloatingActionButton postArticle;
-
     @BindView(R.id.title) TextInputEditText title_text;
     @BindView(R.id.title_wrapper) TextInputLayout title_wrapper;
     @BindView(R.id.user) TextInputEditText user_text;
@@ -84,6 +80,10 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.content) TextInputEditText content_text;
     @BindView(R.id.content_wrapper) TextInputLayout content_wrapper;
     @BindView(R.id.progress) ProgressBar progressBar;
+
+    private String filePath;
+    private Uri draftUri;
+    private boolean save = true;
 
     private PublishSubject<Boolean> created = PublishSubject.create();
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
@@ -102,7 +102,7 @@ public class PostActivity extends AppCompatActivity {
 
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
@@ -115,28 +115,28 @@ public class PostActivity extends AppCompatActivity {
 
     private void handleIntentExtras() {
         Intent extras = getIntent();
-        if(extras == null) return;
+        if (extras == null) return;
 
         int id = extras.getIntExtra(PostDraft.ID, -1);
-        if(id != -1) draftUri = DatabaseProvider.Drafts.withId(id);
+        if (id != -1) draftUri = DatabaseProvider.Drafts.withId(id);
 
         String title = extras.getStringExtra(PostDraft.TITLE);
         String author = extras.getStringExtra(PostDraft.AUTHOR);
         String content = extras.getStringExtra(PostDraft.CONTENT);
         String filePath = extras.getStringExtra(PostDraft.FILE_PATH);
 
-        if(title != null) title_text.setText(title);
-        if(author != null) user_text.setText(author);
-        if(content != null) content_text.setText(content);
+        if (title != null) title_text.setText(title);
+        if (author != null) user_text.setText(author);
+        if (content != null) content_text.setText(content);
 
-        if(filePath != null) {
+        if (filePath != null) {
             this.filePath = filePath;
             imageLoaded();
         }
     }
 
     private void imageLoaded() {
-        if(filePath == null)
+        if (filePath == null)
             return;
 
         Picasso.with(this)
@@ -165,21 +165,21 @@ public class PostActivity extends AppCompatActivity {
 
         Subscription subscription = formObservable
                 .subscribe(isValid -> {
-                    if(isValid) {
+                    if (isValid) {
                         textInputLayout.setError(null);
                         textInputLayout.setErrorEnabled(false);
                     } else {
                         textInputLayout.setErrorEnabled(true);
                         textInputLayout.setError(message);
                     }
-        });
+                });
 
         compositeSubscription.add(subscription);
 
         return formObservable;
     }
 
-    private void setupForm(){
+    private void setupForm() {
         postArticle.hide();
 
         Observable<Boolean> titleObservable = formValidObservable(title_text, title_wrapper, 2, 50);
@@ -194,7 +194,7 @@ public class PostActivity extends AppCompatActivity {
                 (titleValid, userValid, contentValid, photoCreated) ->
                         titleValid && userValid && contentValid && photoCreated)
                 .subscribe(valid -> {
-                    if(valid) {
+                    if (valid) {
                         postArticle.show();
                     } else {
                         postArticle.hide();
@@ -227,7 +227,7 @@ public class PostActivity extends AppCompatActivity {
             public void onSuccess(PostConfirmation postConfirmation) {
                 progressBar.setVisibility(View.GONE);
 
-                if(postConfirmation.getError()) {
+                if (postConfirmation.getError()) {
                     Snackbar.make(rootLayout, postConfirmation.getMessage(),
                             Snackbar.LENGTH_LONG).show();
                 } else {
@@ -248,7 +248,7 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable throwable) {
                 progressBar.setVisibility(View.GONE);
-                if(throwable instanceof HttpException) {
+                if (throwable instanceof HttpException) {
                     PostConfirmation postConfirmation = ErrorUtils.parseError(
                             ((HttpException) throwable).response()
                     );
@@ -261,12 +261,13 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void saveInDraft() {
-        if(draftUri == null) savePost(); else updatePost();
+        if (draftUri == null) savePost();
+        else updatePost();
     }
 
     private void queryHandler(boolean condition) {
         progressBar.setVisibility(View.GONE);
-        if(condition) {
+        if (condition) {
 
             Snackbar.make(rootLayout, getString(R.string.post_saved), Snackbar.LENGTH_LONG)
                     .setAction(getString(R.string.undo), view -> deleteDraft())
@@ -288,7 +289,7 @@ public class PostActivity extends AppCompatActivity {
         Subscription postSubscription = DraftsHelper.insertDraft(preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE))
                 .subscribe(uri -> {
                     draftUri = uri;
                     queryHandler(uri != null);
@@ -298,7 +299,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void updatePost() {
-        if(draftUri == null) {
+        if (draftUri == null) {
             Snackbar.make(rootLayout, getString(R.string.error_updating_draft), Snackbar.LENGTH_LONG)
                     .setAction(getString(android.R.string.yes), view -> savePost())
                     .show();
@@ -309,7 +310,7 @@ public class PostActivity extends AppCompatActivity {
         Subscription postSubscription = DraftsHelper.updateDraft(draftUri, preparePost())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE))
                 .subscribe(rows -> {
                     queryHandler(rows != 0);
                 }, throwableHandler);
@@ -318,7 +319,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private void deleteDraft() {
-        if(draftUri == null) {
+        if (draftUri == null) {
             Snackbar.make(rootLayout, getString(R.string.no_draft_to_delete), Snackbar.LENGTH_LONG)
                     .setAction(getString(android.R.string.yes), view -> saveInDraft())
                     .show();
@@ -329,7 +330,7 @@ public class PostActivity extends AppCompatActivity {
         Subscription postSubscription = DraftsHelper.deleteUri(draftUri)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE) )
+                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE))
                 .subscribe(rows -> {
                     progressBar.setVisibility(View.GONE);
                     if (rows != 0) {
@@ -362,7 +363,7 @@ public class PostActivity extends AppCompatActivity {
         pickIntent.setType("image/*");
 
         Intent chooserIntent = Intent.createChooser(getIntent, getString(R.string.select_image));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
@@ -423,7 +424,7 @@ public class PostActivity extends AppCompatActivity {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         super.onDismissed(transientBottomBar, event);
-                        if(save) {
+                        if (save) {
                             Toast.makeText(context, getString(R.string.saving_in_drafts), Toast.LENGTH_SHORT).show();
                             saveInDraft();
                         }
@@ -474,7 +475,7 @@ public class PostActivity extends AppCompatActivity {
 
         filePath = savedInstanceState.getString(IMAGE_TAG);
 
-        if(filePath == null)
+        if (filePath == null)
             return;
 
         imageLoaded();
@@ -483,7 +484,7 @@ public class PostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(compositeSubscription != null) compositeSubscription.unsubscribe();
+        if (compositeSubscription != null) compositeSubscription.unsubscribe();
         PostUploader.cleanup();
 
         RefWatcher refWatcher = FeddupApp.getRefWatcher(this);

@@ -5,14 +5,14 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.iamareebjamal.feddup.data.db.DatabaseProvider;
-import com.iamareebjamal.feddup.data.db.schema.PostCacheColumns;
-import com.iamareebjamal.feddup.data.db.schema.PostColumns;
-import com.iamareebjamal.feddup.data.models.Post;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.iamareebjamal.feddup.data.db.DatabaseProvider;
+import com.iamareebjamal.feddup.data.db.schema.PostCacheColumns;
+import com.iamareebjamal.feddup.data.db.schema.PostColumns;
+import com.iamareebjamal.feddup.data.models.Post;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
@@ -26,7 +26,7 @@ public class FavoritesHelper {
     }
 
     private static void verify() {
-        if(contentResolver == null)
+        if (contentResolver == null)
             throw new IllegalAccessError("FavoritesHelper : Must call initialize with ContentResolver first");
     }
 
@@ -57,7 +57,7 @@ public class FavoritesHelper {
 
             Observable<String> results = getFavoritesFromCursor(cursor);
 
-            if(cursor != null) cursor.close();
+            if (cursor != null) cursor.close();
 
             return results;
         });
@@ -101,7 +101,7 @@ public class FavoritesHelper {
                             int rows = contentResolver.update(
                                     DatabaseProvider.PostCache.CONTENT_URI, values,
                                     PostCacheColumns.key + "=?",
-                                    new String[]{ key }
+                                    new String[]{key}
                             );
 
                             if (rows == 0)
