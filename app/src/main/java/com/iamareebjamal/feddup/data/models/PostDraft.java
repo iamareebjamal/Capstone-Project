@@ -7,6 +7,7 @@ import java.io.File;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import retrofit2.Call;
 import rx.Observable;
 
 public class PostDraft {
@@ -62,7 +63,7 @@ public class PostDraft {
         return filePath;
     }
 
-    public Observable<PostConfirmation> send() {
+    public Call<PostConfirmation> send() {
         File file = new File(filePath);
 
         RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), file);

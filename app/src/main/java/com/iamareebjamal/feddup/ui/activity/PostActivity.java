@@ -33,6 +33,8 @@ import android.widget.Toast;
 
 import com.iamareebjamal.feddup.FeddupApp;
 import com.iamareebjamal.feddup.R;
+import com.iamareebjamal.feddup.api.PostUploadListener;
+import com.iamareebjamal.feddup.api.PostUploader;
 import com.iamareebjamal.feddup.data.db.DatabaseProvider;
 import com.iamareebjamal.feddup.data.db.utils.DraftsHelper;
 import com.iamareebjamal.feddup.data.models.PostConfirmation;
@@ -50,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Response;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.Subscription;
@@ -214,33 +217,47 @@ public class PostActivity extends AppCompatActivity {
 
     @OnClick(R.id.post)
     public void sendPost() {
-        Subscription postSubscription = preparePost().send()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(() -> progressBar.setVisibility(View.VISIBLE))
-                .subscribe(postConfirmation -> {
-                    progressBar.setVisibility(View.GONE);
+        PostUploader.post(preparePost(), new PostUploadListener() {
+            @Override
+            public void onStart() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
 
-                    if(postConfirmation.getError()) {
-                        Snackbar.make(rootLayout, postConfirmation.getMessage(),
-                                Snackbar.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this, getString(R.string.post_created), Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                }, throwable -> {
-                    progressBar.setVisibility(View.GONE);
-                    if(throwable instanceof HttpException) {
-                        PostConfirmation postConfirmation = ErrorUtils.parseError(
-                                ((HttpException) throwable).response()
-                        );
+            @Override
+            public void onSuccess(PostConfirmation postConfirmation) {
+                progressBar.setVisibility(View.GONE);
 
-                        Snackbar.make(rootLayout, postConfirmation.getMessage(),
-                                Snackbar.LENGTH_LONG).show();
-                    }
-                });
+                if(postConfirmation.getError()) {
+                    Snackbar.make(rootLayout, postConfirmation.getMessage(),
+                            Snackbar.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), getString(R.string.post_created), Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            }
 
-        compositeSubscription.add(postSubscription);
+            @Override
+            public void onNetworkError(Response throwable) {
+                progressBar.setVisibility(View.GONE);
+                PostConfirmation postConfirmation = ErrorUtils.parseError(throwable);
+
+                Snackbar.make(rootLayout, postConfirmation.getMessage(),
+                        Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                progressBar.setVisibility(View.GONE);
+                if(throwable instanceof HttpException) {
+                    PostConfirmation postConfirmation = ErrorUtils.parseError(
+                            ((HttpException) throwable).response()
+                    );
+
+                    Snackbar.make(rootLayout, postConfirmation.getMessage(),
+                            Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void saveInDraft() {
@@ -467,6 +484,7 @@ public class PostActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if(compositeSubscription != null) compositeSubscription.unsubscribe();
+        PostUploader.cleanup();
 
         RefWatcher refWatcher = FeddupApp.getRefWatcher(this);
         refWatcher.watch(this);
