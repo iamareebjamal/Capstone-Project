@@ -52,6 +52,8 @@
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/detail_margin"
         android:paddingRight="@dimen/detail_margin"
+        android:paddingStart="@dimen/detail_margin"
+        android:paddingEnd="@dimen/detail_margin"
         android:layout_marginTop="@dimen/detail_card_overlap"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -74,6 +76,8 @@
                     android:paddingBottom="10dp"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
                     android:paddingTop="20dp">
 
                     <TextView
