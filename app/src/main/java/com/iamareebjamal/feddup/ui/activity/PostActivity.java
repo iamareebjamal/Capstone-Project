@@ -67,6 +67,7 @@ public class PostActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 34;
     private String filePath;
     private Uri draftUri;
+    private boolean save = true;
 
     @BindView(R.id.activity_post) CoordinatorLayout rootLayout;
     @BindView(R.id.toolbar) Toolbar mToolbar;
@@ -81,10 +82,10 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.content_wrapper) TextInputLayout content_wrapper;
     @BindView(R.id.progress) ProgressBar progressBar;
 
-    PublishSubject<Boolean> created = PublishSubject.create();
-    CompositeSubscription compositeSubscription = new CompositeSubscription();
+    private PublishSubject<Boolean> created = PublishSubject.create();
+    private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
-    Action1<Throwable> throwableHandler = (throwable) -> {
+    private Action1<Throwable> throwableHandler = (throwable) -> {
         progressBar.setVisibility(View.GONE);
         Log.d(TAG, throwable.getMessage());
     };
@@ -388,7 +389,6 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
-    private boolean save = true;
     @Override
     public void onBackPressed() {
 

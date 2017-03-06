@@ -113,7 +113,7 @@ public class FavoritesHelper {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            // Nothing to save here
                         }
                     });
             return null;

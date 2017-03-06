@@ -47,6 +47,7 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
     private List<PostDraft> drafts = new ArrayList<>();
     private DraftsAdapter draftsAdapter = new DraftsAdapter(drafts);
 
+    private boolean moveUp;
     private Subscription subscription;
 
     @Override
@@ -68,7 +69,6 @@ public class DraftsActivity extends AppCompatActivity implements LoaderManager.L
         setupList();
     }
 
-    private boolean moveUp;
     private void setupList() {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
 

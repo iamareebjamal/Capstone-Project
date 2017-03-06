@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                break;
             case R.id.drafts:
                 loadDrafts();
                 break;

@@ -76,6 +76,31 @@ public class DetailFragment extends Fragment {
 
     private CompositeSubscription compositeSubscription;
 
+    private Action1<Throwable> throwableHandler = throwable ->
+            Log.d(TAG, "Error " + throwable.getMessage());
+
+    private View.OnClickListener addDownvote = view -> {
+        if(post == null) return;
+
+        Subscription subscription = DownvotesHelper.addDownvote(key, post.downvotes)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(uri -> Log.d(TAG, "Added " + uri), throwableHandler);
+
+        compositeSubscription.add(subscription);
+    };
+
+    private View.OnClickListener removeDownvote = view -> {
+        if(post == null) return;
+
+        Subscription subscription = DownvotesHelper.removeDownvote(key, post.downvotes)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(rows -> Log.d(TAG, "Removed " + rows), throwableHandler);
+
+        compositeSubscription.add(subscription);
+    };
+
     public DetailFragment() { }
 
     @Override
@@ -160,31 +185,6 @@ public class DetailFragment extends Fragment {
         });
 
     }
-
-    private Action1<Throwable> throwableHandler = throwable ->
-            Log.d(TAG, "Error " + throwable.getMessage());
-
-    private View.OnClickListener addDownvote = view -> {
-        if(post == null) return;
-
-        Subscription subscription = DownvotesHelper.addDownvote(key, post.downvotes)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(uri -> Log.d(TAG, "Added " + uri), throwableHandler);
-
-        compositeSubscription.add(subscription);
-    };
-
-    private View.OnClickListener removeDownvote = view -> {
-        if(post == null) return;
-
-        Subscription subscription = DownvotesHelper.removeDownvote(key, post.downvotes)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(rows -> Log.d(TAG, "Removed " + rows), throwableHandler);
-
-        compositeSubscription.add(subscription);
-    };
 
     private void loadArticleStatus(String key) {
         Subscription dbSubscription = DownvotesHelper.isDownvoted(key)
