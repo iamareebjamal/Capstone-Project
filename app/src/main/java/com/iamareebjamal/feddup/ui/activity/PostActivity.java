@@ -104,9 +104,9 @@ public class PostActivity extends AppCompatActivity {
         }
 
         created.subscribe(loaded -> Log.d(TAG, "Photo Loaded : " + loaded));
-        handleIntentExtras();
 
         setupForm();
+        handleIntentExtras();
     }
 
     private void handleIntentExtras() {
@@ -152,6 +152,7 @@ public class PostActivity extends AppCompatActivity {
 
         Observable<Boolean> formObservable =
                 RxTextView.textChanges(textView)
+                        .skip(1)
                         .map(inputText ->
                                 inputText.length() > lower_bound && inputText.length() < upper_bound)
                         .distinctUntilChanged()
@@ -159,7 +160,6 @@ public class PostActivity extends AppCompatActivity {
                         .observeOn(AndroidSchedulers.mainThread());
 
         Subscription subscription = formObservable
-                .skip(1)
                 .subscribe(isValid -> {
                     if(isValid) {
                         textInputLayout.setError(null);
