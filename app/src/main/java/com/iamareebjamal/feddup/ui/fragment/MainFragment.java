@@ -101,8 +101,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
-        //    gridLayoutManager.setSpanCount(2);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
+            gridLayoutManager.setSpanCount(2);
 
         Query postReference = FirebaseDatabase.getInstance().getReference("posts").orderByChild("downvotes").limitToFirst(10);
 

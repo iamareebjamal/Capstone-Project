@@ -114,8 +114,8 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        //if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
-        //    gridLayoutManager.setSpanCount(2);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet())
+            gridLayoutManager.setSpanCount(2);
 
         PostHolder.setFragmentInteractionListener(mListener);
 

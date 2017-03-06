@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="detail_margin">80dp</dimen>
+    <dimen name="detail_card_overlap">-60dp</dimen>
+</resources>

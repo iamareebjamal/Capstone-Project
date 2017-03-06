@@ -6,6 +6,7 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/grey"
     android:fitsSystemWindows="@bool/fitsSystemWindow">
 
     <android.support.design.widget.AppBarLayout
@@ -49,91 +50,100 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingLeft="@dimen/detail_margin"
+        android:paddingRight="@dimen/detail_margin"
+        android:layout_marginTop="@dimen/detail_card_overlap"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content" >
 
             <LinearLayout
-                android:id="@+id/meta_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:background="#333"
-                android:orientation="vertical"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="20dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/article_title"
-                    style="?android:attr/textAppearanceLarge"
+                <LinearLayout
+                    android:id="@+id/meta_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:drawableLeft="@drawable/ic_pen"
-                    android:drawablePadding="10dp"
-                    android:drawableStart="@drawable/ic_pen"
-                    android:fontFamily="sans-serif-condensed"
-                    android:textColor="#bbffffff"
-                    tools:text="A brief about Material Design" />
+                    android:layout_gravity="bottom"
+                    android:background="#333"
+                    android:orientation="vertical"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="20dp">
+
+                    <TextView
+                        android:id="@+id/article_title"
+                        style="?android:attr/textAppearanceLarge"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_pen"
+                        android:drawablePadding="10dp"
+                        android:drawableStart="@drawable/ic_pen"
+                        android:fontFamily="sans-serif-condensed"
+                        android:textColor="#bbffffff"
+                        tools:text="A brief about Material Design" />
+
+                    <TextView
+                        android:id="@+id/date"
+                        style="?android:attr/textAppearanceSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_time"
+                        android:drawablePadding="10dp"
+                        android:drawableStart="@drawable/ic_time"
+                        android:textColor="#8fff"
+                        tools:text="5:52 PM, 25th January 2016" />
+
+
+                    <TextView
+                        android:id="@+id/author"
+                        style="?android:attr/textAppearanceSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_face"
+                        android:drawablePadding="10dp"
+                        android:drawableStart="@drawable/ic_face"
+                        android:textColor="#8fff"
+                        android:textStyle="italic"
+                        tools:text="iamareebjamal" />
+
+                    <TextView
+                        android:id="@+id/downvotes"
+                        style="?android:attr/textAppearanceSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center_vertical"
+                        android:drawableLeft="@drawable/ic_thumb_down_outline"
+                        android:drawablePadding="10dp"
+                        android:drawableStart="@drawable/ic_thumb_down_outline"
+                        android:textColor="#8fff"
+                        tools:text="-6" />
+
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/date"
-                    style="?android:attr/textAppearanceSmall"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/article_body"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:drawableLeft="@drawable/ic_time"
-                    android:drawablePadding="10dp"
-                    android:drawableStart="@drawable/ic_time"
-                    android:textColor="#8fff"
-                    tools:text="5:52 PM, 25th January 2016" />
-
-
-                <TextView
-                    android:id="@+id/author"
-                    style="?android:attr/textAppearanceSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:drawableLeft="@drawable/ic_face"
-                    android:drawablePadding="10dp"
-                    android:drawableStart="@drawable/ic_face"
-                    android:textColor="#8fff"
-                    android:textStyle="italic"
-                    tools:text="iamareebjamal" />
-
-                <TextView
-                    android:id="@+id/downvotes"
-                    style="?android:attr/textAppearanceSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center_vertical"
-                    android:drawableLeft="@drawable/ic_thumb_down_outline"
-                    android:drawablePadding="10dp"
-                    android:drawableStart="@drawable/ic_thumb_down_outline"
-                    android:textColor="#8fff"
-                    tools:text="-6" />
-
+                    android:padding="10dp"
+                    tools:text="We challenged ourselves to create a visual language for our users that synthesizes the classic principles of good design with the innovation and possibility of technology and science. This is material design. This spec is a living document that will be updated as we continue to develop the tenets and specifics of material design." />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/article_body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                tools:text="We challenged ourselves to create a visual language for our users that synthesizes the classic principles of good design with the innovation and possibility of technology and science. This is material design. This spec is a living document that will be updated as we continue to develop the tenets and specifics of material design." />
-
-        </LinearLayout>
+        </android.support.v7.widget.CardView>
 
     </android.support.v4.widget.NestedScrollView>
 
