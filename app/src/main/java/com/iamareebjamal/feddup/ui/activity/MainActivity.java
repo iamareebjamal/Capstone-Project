@@ -153,6 +153,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInteracti
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBoolean(FAVORITE, showFavorite);
+        outState.putBoolean(FAVORITE, !showFavorite);
     }
 }
