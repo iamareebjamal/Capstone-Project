@@ -101,9 +101,6 @@ public class DetailFragment extends Fragment {
         compositeSubscription.add(subscription);
     };
 
-    public DetailFragment() {
-    }
-
     public static int getDarkColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);

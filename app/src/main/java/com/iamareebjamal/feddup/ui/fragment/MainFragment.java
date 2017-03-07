@@ -60,10 +60,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
     private boolean moveUp, started;
 
-    public MainFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

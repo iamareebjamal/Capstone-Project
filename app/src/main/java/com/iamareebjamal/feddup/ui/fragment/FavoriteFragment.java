@@ -73,10 +73,6 @@ public class FavoriteFragment extends Fragment implements LoaderManager.LoaderCa
     private Map<Query, ValueEventListener> firebaseListeners = new HashMap<>();
     private boolean moveUp, started;
 
-    public FavoriteFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
