@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "803534778982",
+    "firebase_url": "https://iamfeddup.firebaseio.com",
+    "project_id": "iamfeddup",
+    "storage_bucket": "iamfeddup.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803534778982:android:beb71b53b2ea9e48",
+        "android_client_info": {
+          "package_name": "com.example.iamareebjamal.feddup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803534778982-1cu82chjdr9e4vlp5nmpi8ab1v399p59.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2U0jr3_sssiD9wae3kFVM80bxt7e99yQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803534778982:android:9b8ac99ccaefb011",
+        "android_client_info": {
+          "package_name": "com.iamareebjamal.feddup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803534778982-1cu82chjdr9e4vlp5nmpi8ab1v399p59.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2U0jr3_sssiD9wae3kFVM80bxt7e99yQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
